@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
           {/* BOTÃO NOVO POST */}
           <button 
-            onClick={() => { onNewPost(); onClose(); }}
+            onClick={() => { onNewPost(); onClose?.(); }}
             className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2.5 transition-all font-bold text-sm shadow-lg shadow-blue-900/20 border border-blue-500/50 hover:-translate-y-0.5"
           >
             <span className="text-xl font-light leading-none">+</span> NOVO POST
@@ -83,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 posts.map((post) => (
                   <button
                     key={post.id}
-                    onClick={() => { onSelectPost(post); onClose(); }}
+                    onClick={() => { onSelectPost(post); onClose?.(); }}
                     className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-all truncate border group relative ${
                       currentPostId === post.id 
                       ? 'bg-blue-900/10 text-blue-400 border-blue-500/20 font-semibold' 
