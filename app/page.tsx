@@ -186,6 +186,31 @@ const App: React.FC = () => {
     }
   };
 
+  // Função para chamar o Stripe
+  const handleCheckout = async () => {
+    try {
+      setLoading(true); // Mostra que está carregando (opcional)
+      
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Redireciona o usuário para o site do Stripe
+        window.location.href = data.url;
+      } else {
+        alert("Erro ao iniciar pagamento");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao conectar com pagamento");
+      setLoading(false);
+    }
+  };
+
   const handleNewPost = () => {
     setCurrentPost(null);
     setContext('');
@@ -293,7 +318,10 @@ const App: React.FC = () => {
               </div>
 
               {/* BOTÃO DE AÇÃO */}
-              <button className="w-full sm:w-auto min-w-[280px] bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-blue-600/20 hover:scale-105 hover:shadow-blue-500/30 active:scale-95 group">
+              <button
+                onClick={handleCheckout}
+                className="w-full sm:w-auto min-w-[280px] bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-blue-600/20 hover:scale-105 hover:shadow-blue-500/30 active:scale-95 group"
+              >
                 DESBLOQUEAR AGORA
               </button>
 
