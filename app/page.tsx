@@ -1,7 +1,7 @@
 "use client";
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import MarkdownRenderer from './components/MarkdownRenderer';
 import { useRouter } from 'next/navigation';
@@ -53,6 +53,19 @@ const App: React.FC = () => {
     { label: "🎓 Tutorial", text: "Um passo a passo ensinando como resolver [ERRO TÉCNICO] usando [TECNOLOGIA]." },
     { label: "🔥 Polêmica", text: "Por que eu acho que [FERRAMENTA POPULAR] está sendo superestimada pelo mercado atualmente." },
   ];
+
+  // REFERÊNCIA PARA O SCROLL AUTOMÁTICO
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  // FUNÇÃO PARA PERMITIR EDIÇÃO DO TEXTO GERADO
+  const handleContentEdit = (newText: string) => {
+    if (currentPost) {
+      const updated = { ...currentPost, content: newText };
+      setCurrentPost(updated);
+      // Atualiza também no histórico local para não perder a edição se trocar de aba
+      setPosts(prev => prev.map(p => p.id === updated.id ? updated : p));
+    }
+  };
 
   // FUNÇÃO AUXILIAR: BUSCAR PERFIL COMPLETO
   // Essa função unifica a busca de email e status VIP para evitar erros
@@ -265,7 +278,10 @@ const App: React.FC = () => {
     } finally {
       // Importante checar se não é o paywall para não sobrescrever o loading
       if (!showPaywall) {
-        setLoading(false);
+      setLoading(false);
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
       }
     }
   };
@@ -419,7 +435,7 @@ const App: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
             
             {/* BLOCO DA ESQUERDA: SELETORES (Ocupa 8 colunas) */}
-            <div className="lg:col-span-8 flex flex-col justify-between gap-2">
+            <div className="lg:col-span-8 flex flex-col justify-between gap-2 ">
                 
                 {/* LINHA 1: 3 Seletores */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -602,18 +618,40 @@ const App: React.FC = () => {
                   {loading ? 'Criando seu post...' : 'Post Criado com Sucesso'}
                 </h3>
                 {currentPost && (
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(currentPost.content);
-                      // Visual feedback could be added here
-                    }}
-                    className="w-full sm:w-auto text-[10px] font-black tracking-widest text-slate-400 hover:text-white flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-slate-800/50 hover:bg-slate-700 transition-all border border-slate-700/50"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    COPIAR CONTEÚDO
-                  </button>
+                  <div ref={resultRef} className="animate-in fade-in slide-in-from-bottom-4 duration-700 mt-16">
+                    
+                    {/* Cabeçalho do Card de Sucesso */}
+                    <div className="bg-[#0a101f]/40 border border-slate-800/60 rounded-t-xl p-4 flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-slate-200">Post Criado com Sucesso</h3>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-wider">Edite o texto abaixo se necessário</p>
+                          </div>
+                       </div>
+                       
+                       <button 
+                         onClick={() => navigator.clipboard.writeText(currentPost.content)}
+                         className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg transition-colors flex items-center gap-2 border border-slate-700"
+                       >
+                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2v2h-4V5z" /></svg>
+                         COPIAR
+                       </button>
+                    </div>
+
+                    {/* ÁREA EDITÁVEL */}
+                    <div className="bg-[#0a101f]/20 border-x border-b border-slate-800/60 rounded-b-xl p-6 md:p-8">
+                      <textarea
+                        value={currentPost.content}
+                        onChange={(e) => handleContentEdit(e.target.value)}
+                        className="w-full min-h-[400px] bg-transparent border-none focus:ring-0 text-slate-300 text-base leading-loose resize-y outline-none font-light"
+                        spellCheck={false}
+                      />
+                    </div>
+                    
+                  </div>
                 )}
               </div>
 
