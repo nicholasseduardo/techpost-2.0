@@ -520,36 +520,6 @@ const App: React.FC = () => {
             </div>
         </div>
 
-        {/* --- ÁREA DE CONTEXTO LIMPA --- */}
-        <div className="space-y-4 pt-2 border-t border-slate-800/50 mt-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                 Contexto do Post
-               </label>
-            
-               {/* Sugestões agora alinhadas à direita e mais discretas */}
-               <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                  <span className="text-[10px] text-slate-600 font-medium whitespace-nowrap mr-1">Sugestões:</span>
-                  {contextSuggestions.map((suggestion, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setContext(suggestion.text)}
-                      className="flex-shrink-0 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-blue-400 text-[10px] font-medium rounded border border-slate-800 hover:border-blue-500/30 transition-all whitespace-nowrap"
-                    >
-                      {suggestion.label}
-                    </button>
-                  ))}
-               </div>
-            </div>
-
-            <textarea
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-              placeholder="Descreva sobre o que é o post, cole trechos de código ou explique o objetivo..."
-              className="w-full h-32 bg-[#0a101f]/30 border border-slate-800/60 rounded-xl p-5 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm leading-relaxed text-slate-300 placeholder:text-slate-700 shadow-inner"
-            />
-        </div>
-
         {/* --- ÁREA DE CONTEXTO --- */}
         <div className="space-y-3">
             {/* Título e Sugestões alinhados */}
