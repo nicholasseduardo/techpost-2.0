@@ -35,7 +35,7 @@ const App: React.FC = () => {
     setIsAuthChecking(false);
   };
   checkUser();
-}, [router, supabase]);
+  }, [router, supabase]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
