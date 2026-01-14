@@ -348,7 +348,7 @@ const App: React.FC = () => {
         {/* Mobile Header - TRECHO ATUALIZADO COM BOTÃO SAIR */}
         <div className="lg:hidden p-4 border-b border-slate-900 bg-[#050505] flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="TechPost Logo" className="h-8 w-auto object-contain" />
+            <img src="/favicon.png" alt="TechPost Logo" className="h-8 w-auto object-contain" />
           </div>
           
           <div className="flex items-center gap-3">
