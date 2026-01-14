@@ -42,47 +42,74 @@ export async function POST(req: Request) {
       );
     }
 
+    // --- NOVA LÓGICA DE ENTRADA (Múltiplos arquivos + Tamanho) ---
+    const { channel, audience, objective, tone, length, context, filesData } = await req.json();
+
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const data = await req.json();
-    
-    // Montando o prompt com os dados que vieram do frontend
-    const prompt = `
-      Você é um especialista em Copyrighting e Ghostwriter para CTOs e Engenheiros Sêniores, além de especialista em SEO.
-      Sua tarefa é escrever um post para a rede social ${data.channel} com alta densidade, mas leitura fluida.
+    // --- LÓGICA DE TAMANHO ---
+    let lengthInstruction = "";
+    switch (length) {
+      case 'SHORT': 
+        lengthInstruction = "Curto e direto. Máximo 2 parágrafos curtos + 1 frase de impacto. Ideal para leitura rápida."; 
+        break;
+      case 'LONG': 
+        lengthInstruction = "Longo e aprofundado. Mínimo 5 parágrafos. Use estrutura de 'mini-artigo'. Explore os detalhes técnicos."; 
+        break;
+      default: // MEDIUM
+        lengthInstruction = "Tamanho médio. Entre 3 a 4 parágrafos. Equilibrado entre profundidade e fluidez.";
+    }
 
-      PRIMEIRA LINHA OBRIGATÓRIA: 
-      Crie um Título curto (máximo 5 palavras) e chamativo para esse post. Não use aspas.
-      
-      
-      Depois do título, pule duas linhas e comece o post.
-      
+    // --- NOVO PROMPT ---
+    const promptText = `
+      Você é um especialista em Copyrighting e Ghostwriter trabalhando para CTOs e Engenheiros Sêniores.
+      Sua tarefa é escrever um post para a rede social ${channel}.
+
       DADOS DE ENTRADA:
-      - Tema/Contexto: "${data.context}"
-      - Público-Alvo: ${data.audience} -> Muita atenção para usar a linguagem adequada para se conectar com esse público!!
-      - Objetivo: ${data.objective}
-      - Tom de Voz: ${data.tone}
+      - Público-Alvo: ${audience} (Cuidado ao usar linguagem técnica).
+      - Objetivo: ${objective}
+      - Tom de Voz: ${tone}
+      - Tamanho Obrigatório: ${lengthInstruction}
+      - Contexto do Usuário: "${context}"
 
-      ESTRUTURA OBRIGATÓRIA DO POST:
-      1. Hook (Gancho): Uma frase curta e polêmica ou um dado técnico surpreendente para prender a atenção (máximo 2 linhas).
-      2. Desenvolvimento: Explique o problema e a solução técnica, de forma que o público (${data.audience}) consiga entender.
-      3. Conclusão/CTA: Finalize com uma pergunta que gere debate ou perguntas nos comentários.
+      ${filesData && filesData.length > 0 ? "IMPORTANTE: Use os arquivos anexados como fonte principal de informação técnica." : ""}
+
+      ESTRUTURA OBRIGATÓRIA:
+      1. Título: Na PRIMEIRA LINHA, escreva um título curto e chamativo (sem aspas).
+      2. Pule duas linhas.
+      3. Corpo do Post:
+         - Hook (Gancho) polêmico ou técnico.
+         - Desenvolvimento claro da solução.
+         - CTA (Chamada para ação).
 
       REGRAS DE ESTILO:
-      - Use apenas texto normal (não use negrito por exemplo).
-      - Use emojis com moderação, estilo "minimalista", de preferência, só no fim.
-      - Evite jargões corporativos vazios ("sinergia", "disruptivo"). Prefira termos técnicos reais, e só se forem agregar valor.
-      - Parágrafos curtos (máximo 4 frases).
-      - Se o texto for para o Instagram, use parágrafos ainda menores e não ultrapasse 3 parágrafos!
-      - O texto deve parecer escrito por um humano experiente, não por um robô.
-      - Tente expor um pouco de opinião e use ironia leve se necessário.
-      - Se o contexto for pequeno, não crie textos longos, seja direto!
-
-      Gere apenas o conteúdo do post, sem preâmbulos.
+      - Sem negrito (**texto**). Apenas texto puro.
+      - Evite jargões vazios ("sinergia").
+      - Escreva como um humano sênior.
+      - Quando necessário, emita pequenas opiniões e use um pouco de ironia.
     `;
 
-    const result = await model.generateContent(prompt);
+    // --- PROCESSAMENTO DE ARQUIVOS (MULTIMODAL) ---
+    const promptParts: any[] = [{ text: promptText }];
+
+    if (filesData && Array.isArray(filesData) && filesData.length > 0) {
+      filesData.forEach((file: any) => {
+        // Pega apenas a string base64 pura (remove o "data:image/png;base64,")
+        const base64Data = file.base64.split(',')[1];
+        
+        if (base64Data) {
+          promptParts.push({
+            inlineData: {
+              data: base64Data,
+              mimeType: file.mimeType,
+            },
+          });
+        }
+      });
+    }
+
+    const result = await model.generateContent(promptParts);
     const response = await result.response;
     const fullText = response.text();
 
