@@ -415,76 +415,80 @@ const App: React.FC = () => {
             </div>
           )}
 
-        {/* --- NOVO LAYOUT DE 3 COLUNAS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 items-stretch">
+        {/* --- NOVO LAYOUT "BLOCO COMPACTO" --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
             
-            {/* COLUNA 1: SELETORES GERAIS (3 Itens) */}
-            <div className="space-y-2">
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canal</label>
-                    <select 
-                      value={channel} 
-                      onChange={(e) => setChannel(e.target.value as SocialNetwork)}
-                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
-                    >
-                      {Object.values(SocialNetwork).map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
+            {/* BLOCO DA ESQUERDA: SELETORES (Ocupa 8 colunas) */}
+            <div className="lg:col-span-8 flex flex-col justify-between gap-6">
+                
+                {/* LINHA 1: 3 Seletores */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canal</label>
+                        <select 
+                          value={channel} 
+                          onChange={(e) => setChannel(e.target.value as SocialNetwork)}
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                        >
+                          {Object.values(SocialNetwork).map(v => <option key={v} value={v}>{v}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Público</label>
+                        <select 
+                          value={audience}
+                          onChange={(e) => setAudience(e.target.value as TargetAudience)}
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                        >
+                          {Object.values(TargetAudience).map(v => <option key={v} value={v}>{v}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Objetivo</label>
+                        <select 
+                          value={objective}
+                          onChange={(e) => setObjective(e.target.value as PostObjective)}
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                        >
+                          {Object.values(PostObjective).map(v => <option key={v} value={v}>{v}</option>)}
+                        </select>
+                    </div>
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Público</label>
-                    <select 
-                      value={audience}
-                      onChange={(e) => setAudience(e.target.value as TargetAudience)}
-                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
-                    >
-                      {Object.values(TargetAudience).map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                </div>
+                {/* LINHA 2: 2 Seletores (Espandidos para preencher a largura) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tom de Voz</label>
+                        <select 
+                          value={tone}
+                          onChange={(e) => setTone(e.target.value as PostTone)}
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                        >
+                          {Object.values(PostTone).map(v => <option key={v} value={v}>{v}</option>)}
+                        </select>
+                    </div>
 
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Objetivo</label>
-                    <select 
-                      value={objective}
-                      onChange={(e) => setObjective(e.target.value as PostObjective)}
-                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
-                    >
-                      {Object.values(PostObjective).map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tamanho</label>
+                        <select 
+                          value={length}
+                          onChange={(e) => setLength(e.target.value as PostLength)}
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                        >
+                           <option value="SHORT">Curto (Post Rápido)</option>
+                           <option value="MEDIUM">Médio (Padrão)</option>
+                           <option value="LONG">Longo (Artigo/Deep Dive)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            {/* COLUNA 2: ESTILO E TAMANHO (2 Itens) */}
-            <div className="space-y-2">
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tom de Voz</label>
-                    <select 
-                      value={tone}
-                      onChange={(e) => setTone(e.target.value as PostTone)}
-                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
-                    >
-                      {Object.values(PostTone).map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tamanho</label>
-                    <select 
-                      value={length}
-                      onChange={(e) => setLength(e.target.value as PostLength)}
-                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
-                    >
-                       <option value="SHORT">Curto (Post Rápido)</option>
-                       <option value="MEDIUM">Médio (Padrão)</option>
-                       <option value="LONG">Longo (Artigo/Deep Dive)</option>
-                    </select>
-                </div>
-            </div>
-
-            {/* COLUNA 3: ANEXOS (Ocupa altura total) */}
-            <div className="space-y-2 flex flex-col">
+            {/* BLOCO DA DIREITA: ANEXOS (Ocupa 4 colunas e Altura Total) */}
+            <div className="lg:col-span-4 space-y-2 flex flex-col">
                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anexos de Referência</label>
-               <div className="relative group cursor-pointer flex-1 min-h-[140px]">
+               <div className="relative group cursor-pointer flex-1 min-h-[130px]">
                   <input 
                     type="file" 
                     multiple 
@@ -495,18 +499,18 @@ const App: React.FC = () => {
                      <div className="p-3 bg-slate-900/50 rounded-full mb-3 group-hover:scale-110 transition-transform">
                         <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                      </div>
-                     <p className="text-xs font-semibold text-slate-300">Arraste ou clique</p>
+                     <p className="text-xs font-semibold text-slate-300">Arraste ou clique para upload</p>
                      <p className="text-[9px] text-slate-500 mt-1">PDF, PNG, JPG (Múltiplos)</p>
                   </div>
                </div>
 
-               {/* Lista de Arquivos (Chips Compactos) */}
+               {/* Lista de Arquivos Miniatura */}
                {filesData.length > 0 && (
-                 <div className="flex flex-wrap gap-2 mt-2">
+                 <div className="flex flex-wrap gap-2 mt-1">
                    {filesData.map((file, index) => (
                      <div key={index} className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-1 rounded text-[10px] font-medium max-w-full">
-                        <span className="truncate flex-1">{file.name}</span>
-                        <button onClick={() => removeFile(index)} className="hover:text-red-400 p-0.5">
+                        <span className="truncate flex-1 max-w-[120px]">{file.name}</span>
+                        <button onClick={() => removeFile(index)} className="hover:text-red-400">
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                      </div>
@@ -514,6 +518,36 @@ const App: React.FC = () => {
                  </div>
                )}
             </div>
+        </div>
+
+        {/* --- ÁREA DE CONTEXTO LIMPA --- */}
+        <div className="space-y-4 pt-2 border-t border-slate-800/50 mt-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                 Contexto do Post
+               </label>
+            
+               {/* Sugestões agora alinhadas à direita e mais discretas */}
+               <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  <span className="text-[10px] text-slate-600 font-medium whitespace-nowrap mr-1">Sugestões:</span>
+                  {contextSuggestions.map((suggestion, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setContext(suggestion.text)}
+                      className="flex-shrink-0 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-blue-400 text-[10px] font-medium rounded border border-slate-800 hover:border-blue-500/30 transition-all whitespace-nowrap"
+                    >
+                      {suggestion.label}
+                    </button>
+                  ))}
+               </div>
+            </div>
+
+            <textarea
+              value={context}
+              onChange={(e) => setContext(e.target.value)}
+              placeholder="Descreva sobre o que é o post, cole trechos de código ou explique o objetivo..."
+              className="w-full h-32 bg-[#0a101f]/30 border border-slate-800/60 rounded-xl p-5 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm leading-relaxed text-slate-300 placeholder:text-slate-700 shadow-inner"
+            />
         </div>
 
         {/* --- ÁREA DE CONTEXTO --- */}
