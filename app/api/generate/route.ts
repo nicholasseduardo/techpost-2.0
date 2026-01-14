@@ -122,11 +122,11 @@ export async function POST(req: Request) {
     // Salva no Supabase (Note que agora salvamos 'title' e 'content' separado)
     const { error: dbError } = await supabase.from('posts').insert({
         user_id: user.id,
-        context_prompt: data.context,
-        audience: data.audience,
-        tone: data.tone,
-        title: title,       // <--- CAMPO NOVO
-        generated_text: content // <--- Salva só o corpo aqui
+        context_prompt: context, // Usamos 'context' direto, sem 'data.'
+        audience: audience,      // Usamos 'audience' direto
+        tone: tone,              // Usamos 'tone' direto
+        title: title || "Sem Título",
+        generated_text: content || fullText 
     });
 
     if (dbError) {
