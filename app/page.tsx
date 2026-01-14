@@ -298,7 +298,7 @@ const App: React.FC = () => {
   const handleNewPost = () => {
     setCurrentPost(null);
     setContext('');
-    setFilesData(null);
+    setFilesData([]);
   };
 
   // Se estiver checando, mostra tela preta com loading
