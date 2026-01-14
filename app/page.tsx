@@ -16,56 +16,29 @@ import {
 } from './types';
 
 const App: React.FC = () => {
-  // --- BLOCO NOVO DE SEGURANÇA ---
+  // CONFIGURAÇÕES E HOOKS INICIAIS
   const router = useRouter();
   const supabase = createClient();
+
+  // TODOS OS ESTADOS (STATES) ORGANIZADOS
+  // --- Autenticação e Usuário ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [userEmail, setUserEmail] = useState('');
+  const [isVip, setIsVip] = useState(false); 
+  const [usageCount, setUsageCount] = useState(0); 
 
-  // Verifica se tem usuário logado assim que a tela abre
-  useEffect(() => {
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.push('/login');
-    } else {
-      setIsAuthenticated(true);
-      setUserEmail(user.email || ''); // <--- SALVA O EMAIL AQUI
-    }
-    setIsAuthChecking(false);
-  };
-  checkUser();
-  }, [router, supabase]);
-
-  // Adicione isso logo no começo do componente, perto dos outros useEffects
-  useEffect(() => {
-    // Se a URL tiver ?success=true (voltou do Stripe), limpa a URL para ficar bonita
-    // O Supabase vai recarregar o perfil automaticamente na função fetchProfile
-    const query = new URLSearchParams(window.location.search);
-    if (query.get('success')) {
-      // Remove o ?success=true da URL sem recarregar a página
-      window.history.replaceState({}, document.title, "/");
-      // Força um refresh dos dados do usuário para garantir que o VIP apareça
-      fetchProfile(); 
-      alert("Parabéns! Sua conta PRO foi ativada! 🚀");
-    }
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
-  };
-
+  // --- Dados do App ---
   const [posts, setPosts] = useState<GeneratedPost[]>([]);
   const [currentPost, setCurrentPost] = useState<GeneratedPost | null>(null);
+
+  // --- UI ---
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [usageCount, setUsageCount] = useState(0);
   const [showPaywall, setShowPaywall] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
 
-  // Form States
+  // --- Formulário do Gerador ---
   const [channel, setChannel] = useState<SocialNetwork>(SocialNetwork.LINKEDIN);
   const [audience, setAudience] = useState<TargetAudience>(TargetAudience.ENGINEERS);
   const [objective, setObjective] = useState<PostObjective>(PostObjective.AUTHORITY);
@@ -73,7 +46,60 @@ const App: React.FC = () => {
   const [context, setContext] = useState('');
   const [fileData, setFileData] = useState<{ base64: string; mimeType: string } | null>(null);
 
-  // Load from LocalStorage
+  // FUNÇÃO AUXILIAR: BUSCAR PERFIL COMPLETO
+  // Essa função unifica a busca de email e status VIP para evitar erros
+  const fetchProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        setUserEmail(user.email || ''); 
+        
+        // Busca dados extras (VIP e Contagem) na tabela profiles
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          setIsVip(profile.is_vip || false);
+          setUsageCount(profile.usage_count || 0);
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar perfil:", error);
+    }
+  };
+
+  // USEEFFECTS
+
+  // Verifica Autenticação ao abrir a tela
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/login');
+      } else {
+        setIsAuthenticated(true);
+        await fetchProfile(); // Já carrega os dados do usuário
+      }
+      setIsAuthChecking(false);
+    };
+    checkUser();
+  }, [router, supabase]);
+
+  // Verifica retorno do Pagamento (Stripe) ?success=true
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('success')) {
+      window.history.replaceState({}, document.title, "/");
+      fetchProfile(); // Força atualização imediata para liberar o VIP
+      alert("Parabéns! Sua conta PRO foi ativada! 🚀");
+    }
+  }, []);
+
+  // Carrega do LocalStorage (Mantive para compatibilidade, mas o Supabase vai sobrescrever depois)
   useEffect(() => {
     const savedPosts = localStorage.getItem('techpost_history');
     const savedUsage = localStorage.getItem('techpost_usage');
@@ -81,29 +107,29 @@ const App: React.FC = () => {
     if (savedUsage) setUsageCount(parseInt(savedUsage, 10));
   }, []);
 
-  // --- NOVO: Carregar histórico do Supabase ---
+  // Carrega Histórico do Supabase (Fonte da verdade)
   useEffect(() => {
     const fetchHistory = async () => {
-      if (!isAuthenticated) return; // Só busca se tiver logado
+      if (!isAuthenticated) return; 
 
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .order('created_at', { ascending: false }); // Mais recentes primeiro
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Erro ao buscar histórico:', error);
       } else if (data) {
-        // Mapear: O banco usa snake_case, mas seu Frontend usa outros nomes
+        // Formata os dados do banco para o formato do Frontend
         const formattedPosts: GeneratedPost[] = data.map((post: any) => ({
           id: post.id,
           topic: post.title || post.context_prompt || "Post sem título", 
           content: post.generated_text,
           timestamp: new Date(post.created_at).getTime(),
           config: { 
-            channel: SocialNetwork.LINKEDIN, // Valor padrão ou salvar no banco futuramente
+            channel: SocialNetwork.LINKEDIN,
             audience: post.audience, 
-            objective: PostObjective.AUTHORITY, // Valor padrão
+            objective: PostObjective.AUTHORITY, 
             tone: post.tone 
           }
         }));
@@ -111,19 +137,30 @@ const App: React.FC = () => {
         setPosts(formattedPosts);
       }
       
-      // Também atualiza o contador visual
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('usage_count')
-        .single();
-        
-      if (profile) {
-        setUsageCount(profile.usage_count || 0);
+      // Aproveita para garantir que o contador está atualizado
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+          const { data: profile } = await supabase
+          .from('profiles')
+          .select('usage_count')
+          .eq('id', user.id)
+          .single();
+          
+          if (profile) {
+            setUsageCount(profile.usage_count || 0);
+          }
       }
     };
 
     fetchHistory();
   }, [isAuthenticated, supabase]);
+
+  // HANDLERS
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
