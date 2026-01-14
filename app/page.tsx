@@ -538,29 +538,6 @@ const App: React.FC = () => {
             </div>
         </div>
 
-        {/* --- ÁREA DE CONTEXTO (Abaixo das colunas) --- */}
-        <div className="space-y-3">
-            {/* TÍTULO ATUALIZADO */}
-            <div className="flex items-center justify-between">
-               <label className="text-[10px] font-bold text-blue-400 uppercase tracking-widest animate-pulse">
-                 Sem criatividade? Teste estes contextos:
-               </label>
-            </div>
-            
-            {/* Botões de Sugestão */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {contextSuggestions.map((suggestion, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setContext(suggestion.text)}
-                  className="flex-shrink-0 px-4 py-2 bg-slate-800/40 hover:bg-blue-600/10 hover:text-blue-400 hover:border-blue-500/30 text-slate-300 text-xs font-medium rounded-lg border border-slate-800 transition-all whitespace-nowrap"
-                >
-                  {suggestion.label}
-                </button>
-              ))}
-            </div>
-        </div>
-
           {/* Full-width Context Section */}
           <div className="w-full space-y-2 mb-10">
             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Contexto:</label>
