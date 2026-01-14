@@ -49,9 +49,12 @@ export interface GenerationParams {
   audience: TargetAudience;
   objective: PostObjective;
   tone: PostTone;
+  
+  // NOVO: Adicione o tamanho
+  length?: 'SHORT' | 'MEDIUM' | 'LONG'; 
+  
+  // ATUALIZADO: De fileData (objeto) para filesData (lista de objetos)
+  filesData?: { name: string; base64: string; mimeType: string }[]; 
+  
   context: string;
-  filesData?: {
-    base64: string;
-    mimeType: string;
-  };
 }
