@@ -609,59 +609,62 @@ const App: React.FC = () => {
           </div>
 
           {(currentPost || loading) && (
-            <section ref={resultRef} className="bg-slate-900/10 border border-slate-800/40 rounded-2xl p-6 sm:p-12 animate-in fade-in slide-in-from-bottom-8 duration-700 shadow-2xl mt-8">
+            /* 1. REMOVIDO BORDA E FUNDO DO CONTAINER PAI (Só mantém margin e animação) */
+            <section ref={resultRef} className="mt-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
               
-              {/* --- CENÁRIO 1: CARREGANDO... --- */}
               {loading ? (
-                <div className="space-y-8">
-                   <div className="flex items-center gap-3 text-blue-400 mb-6">
-                      <div className="w-5 h-5 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-                      <h3 className="text-lg font-bold tracking-tight">Criando seu post...</h3>
+                /* 2. O LOADING AGORA TEM SEU PRÓPRIO CARD (Para não ficar flutuando) */
+                <div className="bg-slate-900/20 border border-slate-800/40 rounded-2xl p-8 shadow-2xl text-center sm:text-left">
+                   <div className="flex flex-col sm:flex-row items-center gap-4 text-blue-400 mb-8">
+                      <div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+                      <h3 className="text-lg font-bold tracking-tight">A Inteligência Artificial está escrevendo...</h3>
                    </div>
-                   <div className="space-y-4 animate-pulse">
+                   <div className="space-y-4 animate-pulse max-w-2xl">
                       <div className="h-4 bg-slate-800/40 rounded w-3/4"></div>
                       <div className="h-4 bg-slate-800/40 rounded w-full"></div>
                       <div className="h-4 bg-slate-800/40 rounded w-5/6"></div>
-                      <div className="h-4 bg-slate-800/40 rounded w-1/2"></div>
                    </div>
                 </div>
               ) : (
-                /* --- CENÁRIO 2: POST PRONTO (EDITÁVEL) --- */
+                /* 3. O RESULTADO (Sem caixa externa atrapalhando) */
                 currentPost && (
-                  <div className="animate-in fade-in duration-500">
+                  <div className="shadow-2xl rounded-xl overflow-hidden">
                     
                     {/* Cabeçalho do Card */}
-                    <div className="bg-[#0a101f]/60 border border-slate-800/60 rounded-t-xl p-4 flex items-center justify-between backdrop-blur-sm">
+                    <div className="bg-[#0a101f] border-x border-t border-slate-800 rounded-t-xl p-4 flex items-center justify-between">
                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                           </div>
                           <div>
-                            <h3 className="text-sm font-bold text-slate-200">Post Criado com Sucesso</h3>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-wider">Edite o texto abaixo livremente</p>
+                            <h3 className="text-sm font-bold text-slate-200">Post Gerado</h3>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Pronto para edição</p>
                           </div>
                        </div>
                        
                        <button 
                          onClick={() => {
                            navigator.clipboard.writeText(currentPost.content);
-                           alert("Texto copiado!"); 
+                           alert("Conteúdo copiado para a área de transferência!"); 
                          }}
-                         className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 border border-slate-700 hover:border-slate-600 shadow-lg hover:shadow-xl active:scale-95"
+                         className="group px-4 py-2 bg-slate-800/50 hover:bg-blue-600 text-slate-300 hover:text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 border border-slate-700 hover:border-blue-500"
                        >
-                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2v2h-4V5z" /></svg>
+                         {/* ÍCONE DE COPIAR MAIS LIMPO */}
+                         <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                         </svg>
                          COPIAR
                        </button>
                     </div>
 
                     {/* Área de Texto Editável */}
-                    <div className="bg-[#0a101f]/30 border-x border-b border-slate-800/60 rounded-b-xl p-6 md:p-8">
+                    <div className="bg-[#0a101f]/40 border border-slate-800 rounded-b-xl p-0">
                       <textarea
                         value={currentPost.content}
                         onChange={(e) => handleContentEdit(e.target.value)}
-                        className="w-full min-h-[400px] bg-transparent border-none focus:ring-0 text-slate-300 text-base leading-loose resize-y outline-none font-light placeholder:text-slate-700"
+                        className="w-full min-h-[400px] bg-transparent border-none focus:ring-0 text-slate-300 text-[15px] leading-relaxed resize-y outline-none font-light p-6 md:p-8 placeholder:text-slate-700"
                         spellCheck={false}
-                        placeholder="Seu texto aparecerá aqui..."
+                        placeholder="O texto gerado aparecerá aqui..."
                       />
                     </div>
 
