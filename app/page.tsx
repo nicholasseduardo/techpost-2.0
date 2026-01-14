@@ -415,14 +415,11 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* --- NOVO LAYOUT DO FORMULÁRIO --- */}
-        {/* --- NOVO LAYOUT DO FORMULÁRIO (2 COLUNAS) --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+        {/* --- NOVO LAYOUT DE 3 COLUNAS --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 items-stretch">
             
-            {/* COLUNA DA ESQUERDA: SELETORES (Ocupa 5/12 do espaço) */}
-            <div className="lg:col-span-5 space-y-2">
-                
-                {/* Canal */}
+            {/* COLUNA 1: SELETORES GERAIS (3 Itens) */}
+            <div className="space-y-5">
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canal</label>
                     <select 
@@ -434,7 +431,6 @@ const App: React.FC = () => {
                     </select>
                 </div>
 
-                {/* Público */}
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Público</label>
                     <select 
@@ -446,7 +442,6 @@ const App: React.FC = () => {
                     </select>
                 </div>
 
-                {/* Objetivo */}
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Objetivo</label>
                     <select 
@@ -457,8 +452,10 @@ const App: React.FC = () => {
                       {Object.values(PostObjective).map(v => <option key={v} value={v}>{v}</option>)}
                     </select>
                 </div>
+            </div>
 
-                {/* Tom de Voz */}
+            {/* COLUNA 2: ESTILO E TAMANHO (2 Itens) */}
+            <div className="space-y-5">
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tom de Voz</label>
                     <select 
@@ -470,7 +467,6 @@ const App: React.FC = () => {
                     </select>
                 </div>
 
-                {/* Tamanho */}
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tamanho</label>
                     <select 
@@ -485,39 +481,71 @@ const App: React.FC = () => {
                 </div>
             </div>
 
-            {/* COLUNA DA DIREITA: ANEXOS (Ocupa 7/12 do espaço) */}
-            <div className="lg:col-span-7 space-y-2 flex flex-col">
+            {/* COLUNA 3: ANEXOS (Ocupa altura total) */}
+            <div className="space-y-2 flex flex-col">
                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anexos de Referência</label>
-               <div className="relative group cursor-pointer flex-1">
+               <div className="relative group cursor-pointer flex-1 min-h-[140px]">
                   <input 
                     type="file" 
                     multiple 
                     onChange={handleFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
-                  {/* A altura aqui (h-full) fará a caixa de drop acompanhar a altura dos seletores na esquerda */}
-                  <div className="w-full h-full min-h-[300px] bg-[#0a101f]/30 border border-dashed border-slate-800 group-hover:border-blue-500/50 rounded-xl flex flex-col items-center justify-center transition-all p-6 text-center">
-                     <div className="p-4 bg-slate-900/50 rounded-full mb-4 group-hover:scale-110 transition-transform">
-                        <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                  <div className="w-full h-full bg-[#0a101f]/30 border border-dashed border-slate-800 group-hover:border-blue-500/50 rounded-xl flex flex-col items-center justify-center transition-all p-4 text-center">
+                     <div className="p-3 bg-slate-900/50 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                      </div>
-                     <p className="text-sm font-semibold text-slate-300">Arraste arquivos ou clique aqui</p>
-                     <p className="text-xs text-slate-500 mt-2">PDF, PNG, JPG, JPEG (Múltiplos arquivos)</p>
+                     <p className="text-xs font-semibold text-slate-300">Arraste ou clique</p>
+                     <p className="text-[9px] text-slate-500 mt-1">PDF, PNG, JPG (Múltiplos)</p>
                   </div>
                </div>
 
-               {/* Lista de Arquivos (Chips) */}
+               {/* Lista de Arquivos (Chips Compactos) */}
                {filesData.length > 0 && (
-                 <div className="flex flex-wrap gap-2 mt-3">
+                 <div className="flex flex-wrap gap-2 mt-2">
                    {filesData.map((file, index) => (
-                     <div key={index} className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-medium">
-                        <span className="truncate max-w-[150px]">{file.name}</span>
-                        <button onClick={() => removeFile(index)} className="hover:text-red-400 p-0.5 rounded-full hover:bg-red-500/10 transition-colors">
+                     <div key={index} className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-1 rounded text-[10px] font-medium max-w-full">
+                        <span className="truncate flex-1">{file.name}</span>
+                        <button onClick={() => removeFile(index)} className="hover:text-red-400 p-0.5">
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                      </div>
                    ))}
                  </div>
                )}
+            </div>
+        </div>
+
+        {/* --- ÁREA DE CONTEXTO --- */}
+        <div className="space-y-3">
+            {/* Título e Sugestões alinhados */}
+            <div className="space-y-3">
+               <label className="text-[10px] font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                 ⚡ Sem criatividade? Teste estes contextos:
+               </label>
+            
+               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {contextSuggestions.map((suggestion, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setContext(suggestion.text)}
+                      className="flex-shrink-0 px-4 py-2 bg-slate-800/40 hover:bg-blue-600/10 hover:text-blue-400 hover:border-blue-500/30 text-slate-300 text-xs font-medium rounded-lg border border-slate-800 transition-all whitespace-nowrap"
+                    >
+                      {suggestion.label}
+                    </button>
+                  ))}
+               </div>
+            </div>
+
+            {/* Input Principal */}
+            <div className="space-y-2 pt-2">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Contexto do Post</label>
+                <textarea
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="Descreva sobre o que é o post, cole trechos de código ou explique o objetivo..."
+                  className="w-full h-32 bg-[#0a101f]/30 border border-slate-800/60 rounded-xl p-5 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm leading-relaxed text-slate-300 placeholder:text-slate-700 shadow-inner"
+                />
             </div>
         </div>
 
@@ -542,14 +570,6 @@ const App: React.FC = () => {
                 </button>
               ))}
             </div>
-
-            {/* Textarea Principal */}
-            <textarea
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-              placeholder="Descreva sobre o que é o post, cole trechos de código ou explique o objetivo..."
-              className="w-full h-32 bg-[#0a101f]/30 border border-slate-800/60 rounded-xl p-5 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm leading-relaxed text-slate-300 placeholder:text-slate-700 shadow-inner"
-            />
         </div>
 
           {/* Full-width Context Section */}
