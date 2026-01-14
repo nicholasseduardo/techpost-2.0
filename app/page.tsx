@@ -43,8 +43,16 @@ const App: React.FC = () => {
   const [audience, setAudience] = useState<TargetAudience>(TargetAudience.ENGINEERS);
   const [objective, setObjective] = useState<PostObjective>(PostObjective.AUTHORITY);
   const [tone, setTone] = useState<PostTone>(PostTone.PROVOCATIVE);
+  type PostLength = 'SHORT' | 'MEDIUM' | 'LONG';
+  const [length, setLength] = useState<PostLength>('MEDIUM');
   const [context, setContext] = useState('');
-  const [fileData, setFileData] = useState<{ base64: string; mimeType: string } | null>(null);
+  const [filesData, setFilesData] = useState<{ name: string; base64: string; mimeType: string }[]>([]);
+  const contextSuggestions = [
+    { label: "🚀 Lançamento", text: "Gostaria de anunciar uma nova funcionalidade no meu produto que resolve [PROBLEMA]. O tom deve ser empolgante." },
+    { label: "🤔 Reflexão", text: "Uma reflexão sobre os desafios de ser engenheiro júnior e a importância da constância nos estudos." },
+    { label: "🎓 Tutorial", text: "Um passo a passo ensinando como resolver [ERRO TÉCNICO] usando [TECNOLOGIA]." },
+    { label: "🔥 Polêmica", text: "Por que eu acho que [FERRAMENTA POPULAR] está sendo superestimada pelo mercado atualmente." },
+  ];
 
   // FUNÇÃO AUXILIAR: BUSCAR PERFIL COMPLETO
   // Essa função unifica a busca de email e status VIP para evitar erros
@@ -163,17 +171,34 @@ const App: React.FC = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFileData({
-          base64: reader.result as string,
-          mimeType: file.type
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      // Cria uma promessa para ler cada arquivo
+      const fileReaders = Array.from(files).map(file => {
+        return new Promise<{ name: string; base64: string; mimeType: string }>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve({
+              name: file.name,
+              base64: reader.result as string,
+              mimeType: file.type
+            });
+          };
+          reader.readAsDataURL(file);
         });
-      };
-      reader.readAsDataURL(file);
+      });
+
+      // Quando todos forem lidos, atualiza o estado
+      Promise.all(fileReaders).then(newFiles => {
+        // Adiciona aos que já existem (ou substitui, se preferir setFilesData(newFiles))
+        setFilesData(prev => [...prev, ...newFiles]);
+      });
     }
+  };
+
+  // Função para remover um arquivo da lista
+  const removeFile = (index: number) => {
+    setFilesData(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleGenerate = async () => {
@@ -303,11 +328,6 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-3">
-             {/* NOVO: Botão Sair (aparece no celular) */}
-             <button onClick={handleLogout} className="text-xs text-red-400 font-bold border border-red-900/50 px-3 py-1 rounded bg-red-900/10">
-                SAIR
-             </button>
-
              {/* Seu botão de abrir menu existente */}
              <button 
                onClick={() => setIsSidebarOpen(true)}
@@ -387,57 +407,131 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* Top Section: Selectors and Attachment */}
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-8 items-stretch">
-            {/* Selectors Column */}
-            <div className="flex-[2]">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 sm:gap-x-10 sm:gap-y-5">
-                {[
-                  { label: 'Canal', value: channel, setter: setChannel, options: SocialNetwork },
-                  { label: 'Público', value: audience, setter: setAudience, options: TargetAudience },
-                  { label: 'Objetivo', value: objective, setter: setObjective, options: PostObjective },
-                  { label: 'Tom', value: tone, setter: setTone, options: PostTone },
-                ].map((item) => (
-                  <div key={item.label} className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{item.label}</label>
+          {/* --- NOVO LAYOUT DO FORMULÁRIO --- */}
+        <div className="space-y-6 mb-8">
+            
+            {/* LINHA 1: Canal, Público, Objetivo (3 Colunas) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canal</label>
                     <select 
-                      value={item.value} 
-                      onChange={(e) => item.setter(e.target.value as any)}
-                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-200 cursor-pointer hover:bg-[#0d162b]"
+                      value={channel} 
+                      onChange={(e) => setChannel(e.target.value as SocialNetwork)}
+                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
                     >
-                      {Object.values(item.options).map(v => <option key={v} value={v}>{v}</option>)}
+                      {Object.values(SocialNetwork).map(v => <option key={v} value={v}>{v}</option>)}
                     </select>
-                  </div>
-                ))}
-              </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Público</label>
+                    <select 
+                      value={audience}
+                      onChange={(e) => setAudience(e.target.value as TargetAudience)}
+                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                    >
+                      {Object.values(TargetAudience).map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Objetivo</label>
+                    <select 
+                      value={objective}
+                      onChange={(e) => setObjective(e.target.value as PostObjective)}
+                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                    >
+                      {Object.values(PostObjective).map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                </div>
             </div>
 
-            {/* Attachment Column */}
-            <div className="flex-1 space-y-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anexar</label>
-              <div className="min-h-[160px] lg:h-[calc(100%-28px)] border border-dashed border-slate-800/60 rounded-xl p-6 bg-[#0a101f]/30 flex flex-col items-center justify-center text-center group hover:border-blue-600/50 transition-colors cursor-pointer relative">
-                <svg className="w-10 h-10 text-slate-700 mb-2 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <p className="text-xs font-semibold text-slate-300 mb-1">Drag and drop file here</p>
-                <p className="text-[9px] text-slate-600 mb-5 uppercase tracking-wider">PDF, PNG, JPG, JPEG</p>
-                <input 
-                  type="file" 
-                  id="file-upload" 
-                  className="hidden" 
-                  accept="image/*,.pdf" 
-                  onChange={handleFileChange} 
-                />
-                <label 
-                  htmlFor="file-upload" 
-                  className="bg-[#1e293b] hover:bg-slate-700 text-white px-5 py-2 rounded text-[10px] font-bold cursor-pointer transition-all shadow-md"
-                >
-                  Browse files
-                </label>
-                {fileData && <p className="mt-4 text-[10px] text-blue-400 font-bold uppercase animate-pulse">Arquivo Carregado ✓</p>}
-              </div>
+            {/* LINHA 2: Tom e Tamanho (2 Colunas) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tom de Voz</label>
+                    <select 
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value as PostTone)}
+                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                    >
+                      {Object.values(PostTone).map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tamanho</label>
+                    <select 
+                      value={length}
+                      onChange={(e) => setLength(e.target.value as PostLength)}
+                      className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                    >
+                       <option value="SHORT">Curto (Post Rápido)</option>
+                       <option value="MEDIUM">Médio (Padrão)</option>
+                       <option value="LONG">Longo (Artigo/Deep Dive)</option>
+                    </select>
+                </div>
             </div>
-          </div>
+
+            {/* LINHA 3: Upload Múltiplo */}
+            <div className="space-y-2">
+               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anexos de Referência</label>
+               <div className="relative group cursor-pointer">
+                  <input 
+                    type="file" 
+                    multiple 
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="w-full py-8 bg-[#0a101f]/30 border border-dashed border-slate-800 group-hover:border-blue-500/50 rounded-xl flex flex-col items-center justify-center transition-all">
+                     <svg className="w-8 h-8 text-slate-600 mb-2 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                     <p className="text-xs font-semibold text-slate-300">Arraste arquivos ou clique aqui</p>
+                     <p className="text-[9px] text-slate-600 uppercase mt-1">PDF, PNG, JPG (Múltiplos arquivos)</p>
+                  </div>
+               </div>
+
+               {/* Lista de Arquivos (Chips) */}
+               {filesData.length > 0 && (
+                 <div className="flex flex-wrap gap-2 mt-2">
+                   {filesData.map((file, index) => (
+                     <div key={index} className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1.5 rounded text-xs font-medium">
+                        <span className="truncate max-w-[200px]">{file.name}</span>
+                        <button onClick={() => removeFile(index)} className="hover:text-red-400 p-0.5">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                     </div>
+                   ))}
+                 </div>
+               )}
+            </div>
+
+            {/* LINHA 4: Contexto com Sugestões */}
+            <div className="space-y-3 pt-4 border-t border-slate-800/50">
+                <div className="flex items-center justify-between">
+                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Contexto</label>
+                   <span className="text-[10px] text-blue-400 font-medium animate-pulse">Sem criatividade? 👇</span>
+                </div>
+                
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {contextSuggestions.map((suggestion, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setContext(suggestion.text)}
+                      className="flex-shrink-0 px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700 text-slate-300 text-[10px] font-bold uppercase tracking-wide rounded border border-slate-700 transition-colors whitespace-nowrap"
+                    >
+                      {suggestion.label}
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="Descreva sobre o que é o post, cole trechos de código ou explique o objetivo..."
+                  className="w-full h-32 bg-[#0a101f]/30 border border-slate-800/60 rounded-xl p-5 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm leading-relaxed text-slate-300 placeholder:text-slate-700 shadow-inner"
+                />
+            </div>
+        </div>
 
           {/* Full-width Context Section */}
           <div className="w-full space-y-2 mb-10">
