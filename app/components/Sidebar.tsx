@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onClose,
   userEmail, 
   onLogout,
-  usageCount = 0 
+  usageCount = 0, 
   isVip
 }) => {
   return (
