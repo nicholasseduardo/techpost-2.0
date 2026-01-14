@@ -50,7 +50,7 @@ export interface GenerationParams {
   objective: PostObjective;
   tone: PostTone;
   context: string;
-  fileData?: {
+  filesData?: {
     base64: string;
     mimeType: string;
   };
