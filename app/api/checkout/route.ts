@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     // 3. Cria a Sessão de Checkout no Stripe
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'], // Aceita cartão
+      payment_method_types: ['card', 'pix'], // pix e cartão
       line_items: [
         {
           price: process.env.STRIPE_PRICE_ID, // O ID que colocamos no .env
