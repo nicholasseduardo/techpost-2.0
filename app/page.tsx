@@ -351,7 +351,7 @@ const App: React.FC = () => {
         <div className="flex-1 p-6 sm:p-10 max-w-[1400px] mx-auto overflow-y-auto w-full">
           <header className="mb-8 lg:mb-12 max-w-5xl">
             <p className="text-slate-300 text-xl sm:text-2xl font-semibold tracking-tight leading-snug">
-              Transforme código e documentos em conteúdo de alta performance.
+              Transforme código e documentos em textos incríveis!
             </p>
           </header>
 
@@ -419,7 +419,7 @@ const App: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
             
             {/* BLOCO DA ESQUERDA: SELETORES (Ocupa 8 colunas) */}
-            <div className="lg:col-span-8 flex flex-col justify-between gap-6">
+            <div className="lg:col-span-8 flex flex-col justify-between gap-2">
                 
                 {/* LINHA 1: 3 Seletores */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
