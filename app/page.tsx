@@ -419,7 +419,7 @@ const App: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 items-stretch">
             
             {/* COLUNA 1: SELETORES GERAIS (3 Itens) */}
-            <div className="space-y-5">
+            <div className="space-y-2">
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canal</label>
                     <select 
@@ -455,7 +455,7 @@ const App: React.FC = () => {
             </div>
 
             {/* COLUNA 2: ESTILO E TAMANHO (2 Itens) */}
-            <div className="space-y-5">
+            <div className="space-y-2">
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tom de Voz</label>
                     <select 
@@ -535,17 +535,6 @@ const App: React.FC = () => {
                     </button>
                   ))}
                </div>
-            </div>
-
-            {/* Input Principal */}
-            <div className="space-y-2 pt-2">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Contexto do Post</label>
-                <textarea
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="Descreva sobre o que é o post, cole trechos de código ou explique o objetivo..."
-                  className="w-full h-32 bg-[#0a101f]/30 border border-slate-800/60 rounded-xl p-5 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm leading-relaxed text-slate-300 placeholder:text-slate-700 shadow-inner"
-                />
             </div>
         </div>
 
