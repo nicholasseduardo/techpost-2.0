@@ -116,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       {isVip ? 'MEMBRO VIP' : 'CONTA GRATUITA'}
                     </p>
                     <p className="text-[10px] text-slate-500">
-                      {isVip ? 'Acesso Ilimitado' : `${3 - usageCount} posts restantes`}
+                      {isVip ? 'Acesso Ilimitado' : `${2 - usageCount} posts restantes`}
                     </p>
                   </div>
                 </div>
@@ -126,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
                     <div 
                       className="bg-blue-600 h-full rounded-full transition-all duration-500" 
-                      style={{ width: `${(usageCount / 3) * 100}%` }}
+                      style={{ width: `${(usageCount / 2) * 100}%` }}
                     />
                   </div>
                 )}
