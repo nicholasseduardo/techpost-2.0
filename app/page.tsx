@@ -213,7 +213,7 @@ const App: React.FC = () => {
         objective,
         tone,
         context,
-        fileData: fileData || undefined
+        filesData: filesData || undefined
       };
 
       const response = await fetch('/api/generate', {
@@ -298,7 +298,7 @@ const App: React.FC = () => {
   const handleNewPost = () => {
     setCurrentPost(null);
     setContext('');
-    setFileData(null);
+    setFilesData(null);
   };
 
   // Se estiver checando, mostra tela preta com loading
