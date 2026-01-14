@@ -37,6 +37,20 @@ const App: React.FC = () => {
   checkUser();
   }, [router, supabase]);
 
+  // Adicione isso logo no começo do componente, perto dos outros useEffects
+  useEffect(() => {
+    // Se a URL tiver ?success=true (voltou do Stripe), limpa a URL para ficar bonita
+    // O Supabase vai recarregar o perfil automaticamente na função fetchProfile
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('success')) {
+      // Remove o ?success=true da URL sem recarregar a página
+      window.history.replaceState({}, document.title, "/");
+      // Força um refresh dos dados do usuário para garantir que o VIP apareça
+      fetchProfile(); 
+      alert("Parabéns! Sua conta PRO foi ativada! 🚀");
+    }
+  }, []);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
@@ -240,6 +254,8 @@ const App: React.FC = () => {
         onClose={() => setIsSidebarOpen(false)}
         userEmail={userEmail}
         onLogout={handleLogout}
+        usageCount={usageCount}
+        isVip={isVip}
       />
 
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
@@ -416,11 +432,23 @@ const App: React.FC = () => {
                 'GERAR POST'
               )}
             </button>
-            {usageCount < 1 && (
-              <div className="flex items-center gap-3">
-                 <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
-                 <span className="text-[11px] text-blue-400 font-black uppercase tracking-widest text-center">1 Geração Gratuita Disponível</span>
+            {/* LÓGICA DO STATUS (VIP vs FREE) */}
+            {isVip ? (
+              // SE FOR VIP
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                 <span className="text-base">👑</span>
+                 <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">Acesso Ilimitado</span>
               </div>
+            ) : (
+              // SE FOR FREE (Mostra contagem)
+              usageCount < 3 && (
+                <div className="flex items-center gap-3">
+                   <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
+                   <span className="text-[11px] text-blue-400 font-black uppercase tracking-widest text-center">
+                     {2 - usageCount} Gerações Gratuitas Restantes
+                   </span>
+                </div>
+              )
             )}
           </div>
 
