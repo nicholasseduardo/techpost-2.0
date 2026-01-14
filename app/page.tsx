@@ -221,7 +221,15 @@ const App: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(params),
+        body: JSON.stringify({
+          channel,
+          audience,
+          objective,
+          tone,
+          length,
+          context,
+          filesData: filesData.length > 0 ? filesData : undefined 
+        }),
       });
       
       // --- NOVO: AQUI NÓS DETECTAMOS O BLOQUEIO ---
