@@ -41,7 +41,7 @@ export default function PrivacyPage() {
               <p className="font-semibold text-blue-400 mb-2">Sobre os arquivos do usuário (PDFs, Imagens):</p>
               <p className="text-sm">
                 Nós adotamos uma política de <strong>processamento transitório</strong>. Quando o usuário faz upload de um arquivo, ele é enviado diretamente para a API de Inteligência Artificial para leitura e interpretação. 
-                <strong>Nós não armazenamos seus arquivos permanentemente em nosso banco de dados.</strong> Após o processamento e a geração do post, o arquivo não é mantido em nossos servidores.
+                <strong> Nós não armazenamos seus arquivos permanentemente em nosso banco de dados.</strong> Após o processamento e a geração do post, o arquivo não é mantido em nossos servidores.
                 Mantemos apenas informações de <strong>contexto, texto gerado e título</strong> guardadas em um banco de dados para que o usuário consiga acessar seu histórico de textos gerados.
               </p>
             </div>

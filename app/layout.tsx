@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TechPost IA",
-  description: "Gerador de posts com IA para engenheiros",
+  description: "Gerador de posts técnicos com IA",
   icons: {
     icon: '/favicon.png', 
     shortcut: '/favicon.png',
@@ -38,7 +39,7 @@ export default function RootLayout({
         <footer className="bg-[#0a101f] border-t border-slate-800 py-8 mt-auto">
           <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-600 text-xs">
-              © 2026 TechPostIA. Todos os direitos reservados.
+              © 2026 TechPost IA. Todos os direitos reservados.
             </p>
             <div className="flex gap-6">
               <a href="/terms" className="text-slate-500 hover:text-blue-400 text-xs transition-colors">Termos de Uso</a>
@@ -46,6 +47,8 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+
+        <Analytics />
 
       </body>
     </html>
