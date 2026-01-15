@@ -3,15 +3,19 @@
 import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // Importante para os links
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [usageType, setUsageType] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false); // Alternar entre Login e Cadastro
+  const [usageType, setUsageType] = useState('personal'); // Mudei o default para evitar erro de string vazia
+  const [isSignUp, setIsSignUp] = useState(false); 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  
+  // NOVO: Estado para o checkbox de termos
+  const [agreed, setAgreed] = useState(false);
   
   const router = useRouter();
   const supabase = createClient();
@@ -23,7 +27,15 @@ export default function LoginPage() {
 
     try {
       if (isSignUp) {
-        // --- LÓGICA DE CADASTRO ATUALIZADA ---
+        
+        // --- NOVA VALIDAÇÃO DE TERMOS ---
+        if (!agreed) {
+            setMessage("Você precisa concordar com os Termos e Política de Privacidade para criar uma conta.");
+            setLoading(false);
+            return; // Para a execução aqui se não marcou
+        }
+
+        // --- LÓGICA DE CADASTRO ---
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -44,7 +56,7 @@ export default function LoginPage() {
           password,
         });
         if (error) throw error;
-        router.push('/'); // Manda o usuário pra Home logado
+        router.push('/'); 
         router.refresh();
       }
     } catch (error: any) {
@@ -76,7 +88,7 @@ export default function LoginPage() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded bg-gray-800 p-2 border border-gray-700 focus:border-blue-500 outline-none"
+                className="w-full rounded bg-gray-800 p-2 border border-gray-700 focus:border-blue-500 outline-none mb-3"
                 required
               />
               <label className="block text-sm text-gray-400 mb-1">Como você vai usar?</label>
@@ -115,16 +127,34 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* --- NOVO CHECKBOX (Só aparece no Cadastro) --- */}
+          {isSignUp && (
+            <div className="flex items-start gap-3 my-2 pt-2">
+                <div className="flex items-center h-5">
+                <input
+                    id="terms"
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="w-4 h-4 border border-gray-600 rounded bg-gray-800 focus:ring-2 focus:ring-blue-500 text-blue-600 cursor-pointer"
+                />
+                </div>
+                <label htmlFor="terms" className="text-xs text-gray-400 select-none">
+                Eu concordo com os <Link href="/terms" target="_blank" className="text-blue-400 hover:underline">Termos de Uso</Link> e <Link href="/privacy" target="_blank" className="text-blue-400 hover:underline">Política de Privacidade</Link>.
+                </label>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded bg-blue-600 p-2 font-bold hover:bg-blue-700 transition disabled:opacity-50"
+            className="w-full rounded bg-blue-600 p-2 font-bold hover:bg-blue-700 transition disabled:opacity-50 mt-4"
           >
             {loading ? 'Carregando...' : isSignUp ? 'Cadastrar' : 'Entrar'}
           </button>
 
           {message && (
-            <div className="p-3 bg-gray-800 rounded text-center text-sm text-yellow-300 border border-yellow-800">
+            <div className={`p-3 rounded text-center text-sm border ${message.includes('Verifique') ? 'bg-green-900/20 text-green-400 border-green-800' : 'bg-yellow-900/20 text-yellow-300 border-yellow-800'}`}>
               {message}
             </div>
           )}
