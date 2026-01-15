@@ -49,8 +49,7 @@ Aliás, preparei uma condição especial para você adiquirir nosso plano PRO vi
 Se tiver qualquer dúvida ou sugestão, é só responder a este e-mail. Eu leio e respondo todos!
 
 Um abraço,
-Nicholas
-TechPost IA`,
+Nicholas  |  TechPost IA`,
     };
 
     // 4. Envia
