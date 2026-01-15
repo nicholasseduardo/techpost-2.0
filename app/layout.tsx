@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import FeedbackButton from "./components/FeedbackButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,8 @@ export default function RootLayout({
         <main className="min-h-screen bg-[#020617]">
           {children}
         </main>
+
+        <FeedbackButton /> 
 
         {/* --- NOVO RODAPÉ AQUI --- */}
         <footer className="bg-[#0a101f] border-t border-slate-800 py-8 mt-auto">
