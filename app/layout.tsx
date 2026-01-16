@@ -22,6 +22,14 @@ export const metadata: Metadata = {
     shortcut: '/favicon.png',
     apple: '/favicon.png',
   },
+  openGraph: {
+    title: "TechPost IA",
+    description: "Crie posts técnicos que geram autoridade no LinkedIn em segundos.",
+    url: "https://techpostia.vercel.app",
+    siteName: "TechPost IA",
+    locale: "pt_BR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
