@@ -47,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* HEADER: LOGO E FECHAR */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <img src="/Logo.png" alt="TechPost Logo" className="h-15 w-auto object-contain" />
+              <img src="/WideLogo.png" alt="TechPost Logo" className="h-15 w-auto object-contain" />
             </div>
             
             {/* Close button for mobile */}
