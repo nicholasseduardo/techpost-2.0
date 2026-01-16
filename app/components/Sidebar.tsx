@@ -130,16 +130,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     />
                   </div>
                 )}
-
-                {/* Botão Upgrade (só aparece se não for VIP) */}
-                {!isVip && (
-                  <button 
-                    onClick={onNewPost} // Isso vai abrir o modal se ele estiver sem créditos
-                    className="w-full py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[10px] font-bold uppercase tracking-wider rounded transition-all shadow-lg shadow-blue-900/20 hover:scale-[1.02]"
-                  >
-                    Desbloquear Agora 🚀
-                  </button>
-                )}
               </div>
             </div>
 
