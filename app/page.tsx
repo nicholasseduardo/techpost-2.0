@@ -293,7 +293,7 @@ const App: React.FC = () => {
       
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        body: JSON.stringify({ cpf: '00000000000' }), // Envia um CPF (pode pegar de um input depois)
+        body: JSON.stringify({ cpf: '63428956044' }), // Envia um CPF (pode pegar de um input depois)
       });
 
       const data = await response.json();
