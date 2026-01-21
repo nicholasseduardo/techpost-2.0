@@ -293,6 +293,7 @@ const App: React.FC = () => {
       
       const response = await fetch('/api/checkout', {
         method: 'POST',
+        body: JSON.stringify({ cpf: '00000000000' }), // Envia um CPF (pode pegar de um input depois)
       });
 
       const data = await response.json();
@@ -301,7 +302,9 @@ const App: React.FC = () => {
         // Redireciona o usuário para o site do Stripe
         window.location.href = data.url;
       } else {
-        alert("Erro ao iniciar pagamento");
+        // Mostra a mensagem real que veio do servidor (ex: "API Key inválida", "CPF obrigatório")
+        alert(`Erro: ${data.error || "Erro desconhecido"}`); 
+        console.error(data); // Ajuda a ver detalhes no F12
         setLoading(false);
       }
     } catch (error) {
