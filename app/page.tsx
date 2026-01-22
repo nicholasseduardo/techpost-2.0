@@ -28,6 +28,7 @@ const App: React.FC = () => {
   const [isVip, setIsVip] = useState(false); 
   const [usageCount, setUsageCount] = useState(0);
   const [cpf, setCpf] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   // --- Dados do App ---
   const [posts, setPosts] = useState<GeneratedPost[]>([]);
@@ -394,79 +395,113 @@ const App: React.FC = () => {
           </header>
 
           {showPaywall && (
-            <div className="bg-[#0A0A0A] border border-blue-500/30 p-8 rounded-2xl mb-8 flex flex-col items-center text-center animate-in fade-in slide-in-from-top-3 duration-500 relative overflow-hidden shadow-2xl shadow-blue-900/20">
-              
-              {/* EFEITO DE FUNDO (GLOW) */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-20 bg-blue-500/10 blur-3xl rounded-full pointer-events-none"></div>
-
-              {/* BADGE DE ESCASSEZ */}
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full mb-6 animate-pulse">
-                ⏳ Oferta por tempo limitado
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-black mb-3 text-white tracking-tight">
-                Limite Gratuito Atingido  = (
-              </h2>
-              
-              <p className="text-slate-400 mb-8 max-w-500 text-sm sm:text-base leading-relaxed">
-                Você atingiu seu limite gratuito. Produza conteúdo ilimitado com o plano PRO!
-              </p>
-
-              <p className="text-slate-300 mb-8 text-sm sm:text-lg leading-relaxed max-w-lg">
-                Estamos oferecendo o plano vitalício com {' '}
-                <span className="font-black text-blue-400">70%</span>
-                {' '} de desconto e{' '}
-                <span className="font-black text-blue-400">pagamento único</span>
-                {' '}para os 100 primeiros usuários, não perca essa oportunidade!
-              </p>
-
-              {/* ÁREA DO PREÇO */}
-              <div className="flex flex-col items-center mb-8 relative">
-                {/* Preço Âncora (Riscado) */}
-                <span className="text-slate-600 text- font-bold line-through mb-1 decoration-red-500/45 decoration-2">
-                  De R$ 49,67
-                </span>
+            <>
+              <div className="bg-[#0A0A0A] border border-blue-500/30 p-8 rounded-2xl mb-8 flex flex-col items-center text-center animate-in fade-in slide-in-from-top-3 duration-500 relative overflow-hidden shadow-2xl shadow-blue-900/20">
                 
-                {/* Preço Real (Grande e Azul) */}
-                <div className="flex items-end gap-1 leading-none">
-                  <span className="text-4xl font-bold text-blue-500">R$</span>
-                  <span className="text-6xl sm:text-7xl font-black text-blue-500 tracking-tighter drop-shadow-lg">
-                    14,90
-                  </span>
+                {/* EFEITO DE FUNDO (GLOW) */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-20 bg-blue-500/10 blur-3xl rounded-full pointer-events-none"></div>
+
+                {/* BADGE DE ESCASSEZ */}
+                <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-[10px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full mb-6 animate-pulse">
+                  ⏳ Oferta por tempo limitado
                 </div>
+
+                <h2 className="text-2xl sm:text-3xl font-black mb-3 text-white tracking-tight">
+                  Limite Gratuito Atingido  = (
+                </h2>
+                
+                <p className="text-slate-400 mb-8 max-w-500 text-sm sm:text-base leading-relaxed">
+                  Você atingiu seu limite gratuito. Produza conteúdo ilimitado com o plano PRO!
+                </p>
+
+                <p className="text-slate-300 mb-8 text-sm sm:text-lg leading-relaxed max-w-lg">
+                  Estamos oferecendo o plano vitalício com {' '}
+                  <span className="font-black text-blue-400">70%</span>
+                  {' '} de desconto e{' '}
+                  <span className="font-black text-blue-400">pagamento único</span>
+                  {' '}para os 100 primeiros usuários, não perca essa oportunidade!
+                </p>
+
+                {/* ÁREA DO PREÇO */}
+                <div className="flex flex-col items-center mb-8 relative">
+                  {/* Preço Âncora (Riscado) */}
+                  <span className="text-slate-600 text- font-bold line-through mb-1 decoration-red-500/45 decoration-2">
+                    De R$ 49,67
+                  </span>
+                  
+                  {/* Preço Real (Grande e Azul) */}
+                  <div className="flex items-end gap-1 leading-none">
+                    <span className="text-4xl font-bold text-blue-500">R$</span>
+                    <span className="text-6xl sm:text-7xl font-black text-blue-500 tracking-tighter drop-shadow-lg">
+                      14,90
+                    </span>
+                  </div>
+                </div>
+
+                {/* BOTÃO PRINCIPAL (Abre o Modal) */}
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="w-full sm:w-auto min-w-[280px] bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-blue-600/20 hover:scale-105 hover:shadow-blue-500/30 active:scale-95 group"
+                >
+                  DESBLOQUEAR AGORA
+                </button>
+
+                <button 
+                  onClick={() => setShowPaywall(false)} 
+                  className="mt-6 text-xs font-bold text-slate-600 hover:text-slate-400 uppercase tracking-widest transition-colors"
+                >
+                  Voltar e esperar renovar
+                </button>
               </div>
 
-              {/* INPUT DE CPF */}
-              <div className="w-full sm:w-auto min-w-[280px] mb-4 text-left">
-                <label className="text-xs font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-wide">
-                  CPF (Para Nota Fiscal)
-                </label>
-                <input 
-                  type="text" 
-                  value={cpf}
-                  onChange={handleCpfChange}
-                  placeholder="000.000.000-00"
-                  maxLength={14}
-                  className="w-full bg-[#111] border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-3 text-white text-lg outline-none transition-colors placeholder:text-slate-700 font-mono"
-                />
-              </div>
+              {/* --- O MODAL (POPUP) - AGORA FICA FORA DO CARTÃO --- */}
+              {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="bg-[#111] border border-slate-800 p-6 rounded-2xl w-full max-w-sm relative shadow-2xl animate-in zoom-in-95 duration-200">
+                    
+                    {/* Botão de Fechar (X) */}
+                    <button 
+                      onClick={() => setShowModal(false)}
+                      className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"
+                    >
+                      ✕
+                    </button>
 
-              {/* BOTÃO DE AÇÃO */}
-              <button
-                onClick={handleCheckout}
-                className="w-full sm:w-auto min-w-[280px] bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-blue-600/20 hover:scale-105 hover:shadow-blue-500/30 active:scale-95 group"
-              >
-                DESBLOQUEAR AGORA
-              </button>
+                    <h3 className="text-xl font-bold text-white mb-2">Quase lá! 🚀</h3>
+                    <p className="text-slate-400 text-sm mb-6">
+                      Para emitir sua nota fiscal e liberar o acesso, precisamos do seu CPF.
+                    </p>
 
-              <button 
-                onClick={() => setShowPaywall(false)} 
-                className="mt-6 text-xs font-bold text-slate-600 hover:text-slate-400 uppercase tracking-widest transition-colors"
-              >
-                Voltar e esperar renovar
-              </button>
-            </div>
+                    {/* Input de CPF */}
+                    <div className="text-left mb-6">
+                      <label className="text-xs font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-wide">
+                        CPF
+                      </label>
+                      <input 
+                        type="text" 
+                        value={cpf}
+                        onChange={handleCpfChange}
+                        placeholder="000.000.000-00"
+                        maxLength={14}
+                        className="w-full bg-[#0A0A0A] border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white text-lg outline-none transition-colors placeholder:text-slate-700 font-mono"
+                      />
+                    </div>
+
+                    {/* Botão de Confirmar e Pagar */}
+                    <button
+                      onClick={handleCheckout}
+                      disabled={loading}
+                      className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {loading ? "Gerando Pix/Boleto..." : "CONFIRMAR E PAGAR"}
+                    </button>
+
+                  </div>
+                </div>
+              )}
+            </> 
           )}
+
 
         {/* --- NOVO LAYOUT "BLOCO COMPACTO" --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
