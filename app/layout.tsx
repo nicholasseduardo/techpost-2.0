@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TechPost IA",
-  description: "Gerador de posts técnicos com IA",
+  description: "Transforme ideias em posts virais para LinkedIn e Instagram. A ferramenta de IA definitiva para desenvolvedores e profissionais de tecnologia.",
+  keywords: ["IA", "LinkedIn", "Tech", "Post Técnico", "Desenvolvimento", "Marketing para Devs"],
   icons: {
     icon: '/favicon.png', 
     shortcut: '/favicon.png',
@@ -30,6 +31,11 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "TechPost IA",
+    description: "Crie posts técnicos que geram autoridade com IA.",
+  },
 };
 
 export default function RootLayout({
@@ -38,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <main className="min-h-screen bg-[#020617]">
           {children}
