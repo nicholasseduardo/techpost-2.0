@@ -1,7 +1,15 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
+  
+  // 🚨 NOVA REGRA: O "Crachá VIP" para o Webhook
+  // Se a rota começar com /api/webhook, deixa passar direto sem checar login
+  if (request.nextUrl.pathname.startsWith('/api/webhook')) {
+    return NextResponse.next()
+  }
+
+  // Para todas as outras rotas, segue o fluxo normal de autenticação
   return await updateSession(request)
 }
 
