@@ -3,7 +3,7 @@ import { createClient } from "../../../utils/supabase/server";
 
 export async function POST(req: Request) {
   try {
-    // 1. Verificar quem é o usuário (Autenticação do Supabase)
+    // 1. Verificar quem é o usuário
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -11,17 +11,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    // 2. Receber dados do Frontend (IMPORTANTE: O Asaas pede CPF)
-    // Se você não estiver enviando CPF do front ainda, use um CPF gerado de teste para a Sandbox por enquanto.
+    // 2. Recebe o CPF do Frontend
     const body = await req.json().catch(() => ({})); 
     const { cpf } = body; 
 
-    // URL base muda se for produção ou sandbox (controlado pelo .env)
+    // Se por acaso o CPF vier vazio (burlando o front), retornamos erro antes de chamar o Asaas
+    if (!cpf) {
+        return NextResponse.json({ error: "CPF é obrigatório" }, { status: 400 });
+    }
+
     const API_URL = process.env.ASAAS_API_URL;
     const API_KEY = process.env.ASAAS_API_KEY;
 
-    // 3. Criar (ou identificar) o Cliente no Asaas
-    // O Asaas precisa de um ID de cliente para gerar cobrança
+    // 3. Criar Cliente
     const customerResponse = await fetch(`${API_URL}/customers`, {
       method: 'POST',
       headers: {
@@ -31,8 +33,8 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         name: user.user_metadata.full_name || 'Cliente TechPost',
         email: user.email,
-        cpfCnpj: cpf || '00000000000', // Fallback apenas para Sandbox se não vier CPF
-        externalReference: user.id // Guarda o ID do Supabase no cadastro do cliente
+        cpfCnpj: cpf, // <--- AGORA USA SÓ O CPF DO USUÁRIO
+        externalReference: user.id
       })
     });
 
@@ -43,7 +45,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: customerData.errors[0].description }, { status: 400 });
     }
 
-    // 4. Criar a Cobrança (O Checkout)
+    // 4. Criar Cobrança
     const paymentResponse = await fetch(`${API_URL}/payments`, {
       method: 'POST',
       headers: {
@@ -51,13 +53,13 @@ export async function POST(req: Request) {
         'access_token': API_KEY!
       },
       body: JSON.stringify({
-        customer: customerData.id, // ID que acabamos de criar acima
-        billingType: 'UNDEFINED', // 'UNDEFINED' deixa o usuário escolher PIX ou Boleto na tela do Asaas
-        value: 14.90, // Valor do seu plano
-        dueDate: new Date().toISOString().split('T')[0], // Vencimento hoje
+        customer: customerData.id,
+        billingType: 'UNDEFINED',
+        value: 14.90, // Confirme se é esse preço mesmo (R$ 14,90)
+        dueDate: new Date().toISOString().split('T')[0],
         description: "Assinatura TechPost VIP",
-        externalReference: user.email, // O TRUQUE: Mandamos o email para o Webhook ler depois e liberar o acesso
-        postalService: false // Desabilita envio de correio físico (importante!)
+        externalReference: user.email,
+        postalService: false
       })
     });
 
@@ -68,7 +70,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: paymentData.errors[0].description }, { status: 400 });
     }
 
-    // 5. Devolve a URL de pagamento ("invoiceUrl" é a página de checkout do Asaas)
     return NextResponse.json({ url: paymentData.invoiceUrl });
 
   } catch (err: any) {

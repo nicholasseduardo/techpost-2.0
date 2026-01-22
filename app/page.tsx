@@ -26,7 +26,8 @@ const App: React.FC = () => {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [userEmail, setUserEmail] = useState('');
   const [isVip, setIsVip] = useState(false); 
-  const [usageCount, setUsageCount] = useState(0); 
+  const [usageCount, setUsageCount] = useState(0);
+  const [cpf, setCpf] = useState('');
 
   // --- Dados do App ---
   const [posts, setPosts] = useState<GeneratedPost[]>([]);
@@ -65,6 +66,19 @@ const App: React.FC = () => {
       // Atualiza também no histórico local para não perder a edição se trocar de aba
       setPosts(prev => prev.map(p => p.id === updated.id ? updated : p));
     }
+  };
+
+  // Função que formata o CPF (000.000.000-00) enquanto digita
+  const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, ''); // Remove letras
+    if (value.length > 11) value = value.slice(0, 11); // Limita tamanho
+  
+    // Aplica a máscara visual
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  
+    setCpf(value);
   };
 
   // FUNÇÃO AUXILIAR: BUSCAR PERFIL COMPLETO
@@ -286,30 +300,35 @@ const App: React.FC = () => {
     }
   };
 
-  // Função para chamar o Stripe
   const handleCheckout = async () => {
+    // Limpa a formatação para validar
+    const cpfLimpo = cpf.replace(/\D/g, '');
+
+    if (cpfLimpo.length !== 11) {
+      alert("Por favor, preencha um CPF válido para a Nota Fiscal.");
+      return;
+    }
+
     try {
-      setLoading(true); // Mostra que está carregando (opcional)
-      
+      setLoading(true);
+    
+      // Chama a nossa API nova do Asaas
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        body: JSON.stringify({ cpf: '63428956044' }), // Envia um CPF (pode pegar de um input depois)
+        body: JSON.stringify({ cpf: cpfLimpo }), // Envia o CPF limpo
       });
 
       const data = await response.json();
 
       if (data.url) {
-        // Redireciona o usuário para o site do Stripe
-        window.location.href = data.url;
+        window.location.href = data.url; // Redireciona para o Asaas
       } else {
-        // Mostra a mensagem real que veio do servidor (ex: "API Key inválida", "CPF obrigatório")
-        alert(`Erro: ${data.error || "Erro desconhecido"}`); 
-        console.error(data); // Ajuda a ver detalhes no F12
+        alert(`Erro: ${data.error || "Tente novamente mais tarde"}`);
         setLoading(false);
       }
     } catch (error) {
       console.error(error);
-      alert("Erro ao conectar com pagamento");
+      alert("Erro de conexão. Verifique sua internet.");
       setLoading(false);
     }
   };
@@ -415,6 +434,21 @@ const App: React.FC = () => {
                     14,90
                   </span>
                 </div>
+              </div>
+
+              {/* INPUT DE CPF */}
+              <div className="w-full sm:w-auto min-w-[280px] mb-4 text-left">
+                <label className="text-xs font-bold text-slate-500 ml-1 mb-1 block uppercase tracking-wide">
+                  CPF (Para Nota Fiscal)
+                </label>
+                <input 
+                  type="text" 
+                  value={cpf}
+                  onChange={handleCpfChange}
+                  placeholder="000.000.000-00"
+                  maxLength={14}
+                  className="w-full bg-[#111] border border-slate-800 focus:border-blue-500 rounded-xl px-4 py-3 text-white text-lg outline-none transition-colors placeholder:text-slate-700 font-mono"
+                />
               </div>
 
               {/* BOTÃO DE AÇÃO */}
