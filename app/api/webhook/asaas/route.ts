@@ -31,7 +31,6 @@ export async function POST(req: Request) {
         .from('profiles') // <--- CONFIRA SE O NOME DA TABELA É ESSE
         .update({ 
           is_vip: true,
-          updated_at: new Date().toISOString() 
         })
         .eq('id', userId)
         .select();
