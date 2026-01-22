@@ -10,7 +10,7 @@ export default function PrivacyPage() {
         
         <header className="border-b border-slate-800 pb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Política de Privacidade</h1>
-          <p className="text-slate-500 text-sm">Última atualização: 15 de Janeiro de 2026</p>
+          <p className="text-slate-500 text-sm">Última atualização: 22 de Janeiro de 2026</p>
         </header>
 
         <div className="space-y-8 text-justify leading-relaxed text-slate-300">
@@ -24,11 +24,12 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">1. Dados que Coletamos</h2>
-            <p>Coletamos apenas o mínimo necessário para o funcionamento do serviço:</p>
+            <p>Coletamos apenas o mínimo necessário para o funcionamento do serviço e cumprimento de obrigações legais:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1 text-slate-400">
               <li><strong>Identificação:</strong> Nome completo e endereço de e-mail (para criação de conta e login).</li>
-              <li><strong>Perfil de Uso:</strong> Informação sobre sua finalidade de uso (ex: Estudante, Profissional, Criador) para estatística interna e personalização futura da experiência do usuário.</li>
-              <li><strong>Dados de Pagamento:</strong> Processados inteiramente pela plataforma de pagamentos Stripe. Nós <strong>não</strong> temos acesso nem armazenamos os números do seu cartão de crédito.</li>
+              <li><strong>Dados Fiscais:</strong> CPF (Cadastro de Pessoa Física). A coleta do CPF é obrigatória para a emissão de cobranças, boletos e notas fiscais, conforme regulamentação bancária brasileira. Nós <strong>não armazenamos o CPF</strong> do usuário internamente, usamos apenas para fins de pagamento.</li>
+              <li><strong>Perfil de Uso:</strong> Informação sobre a finalidade de uso (ex: Estudante, Profissional) para personalização da experiência.</li>
+              <li><strong>Dados de Pagamento:</strong> Processados inteiramente pela plataforma parceira <strong>Asaas</strong>. Nós <strong>não</strong> temos acesso nem armazenamos os números completos de cartão de crédito.</li>
             </ul>
           </section>
 
@@ -51,9 +52,9 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-white mb-3">3. Compartilhamento com Terceiros</h2>
             <p>Não vendemos seus dados. Compartilhamos informações apenas com os serviços essenciais para a operação da plataforma:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1 text-slate-400">
-              <li><strong>Supabase:</strong> Para autenticação segura e armazenamento do histórico de textos gerados pelo usuário.</li>
+              <li><strong>Supabase:</strong> Para autenticação segura e armazenamento do histórico de textos gerados.</li>
               <li><strong>Google (Gemini AI):</strong> Para processamento de inteligência artificial e geração de texto.</li>
-              <li><strong>Stripe:</strong> Para processamento seguro de pagamentos.</li>
+              <li><strong>Asaas:</strong> Gateway de pagamento para processamento seguro de transações financeiras (Pix, Boleto e Cartão) e gestão de assinaturas.</li>
               <li><strong>Vercel:</strong> Para hospedagem da infraestrutura do site.</li>
             </ul>
           </section>
@@ -68,7 +69,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">5. Contato</h2>
             <p>
-              Para solicitações de exclusão de dados, dúvidas ou suporte, o usuário deve entrar em contato conosco através do e-mail oficial:
+              Para solicitações de exclusão de dados, cancelamento de plano, dúvidas ou suporte, o usuário deve entrar em contato conosco através do e-mail oficial:
             </p>
             <a href="mailto:techpost.ia@gmail.com" className="text-blue-400 hover:underline mt-2 block font-medium">
               techpost.ia@gmail.com
