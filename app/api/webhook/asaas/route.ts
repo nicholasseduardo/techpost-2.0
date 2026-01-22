@@ -30,8 +30,7 @@ export async function POST(req: Request) {
       const { data, error } = await supabaseAdmin
         .from('profiles') // <--- CONFIRA SE O NOME DA TABELA É ESSE
         .update({ 
-          is_vip: true, 
-          plan: 'pro',
+          is_vip: true,
           updated_at: new Date().toISOString() 
         })
         .eq('id', userId)
