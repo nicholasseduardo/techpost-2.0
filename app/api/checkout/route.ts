@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         name: user.user_metadata.full_name || 'Cliente TechPost',
         email: user.email,
-        cpfCnpj: cpf, // <--- AGORA USA SÓ O CPF DO USUÁRIO
+        cpfCnpj: cpf, 
         externalReference: user.id
       })
     });
@@ -58,7 +58,11 @@ export async function POST(req: Request) {
         value: 14.90, // Confirme se é esse preço mesmo (R$ 14,90)
         dueDate: new Date().toISOString().split('T')[0],
         description: "Assinatura TechPost VIP",
-        externalReference: user.email,
+        
+        // --- CORREÇÃO AQUI ---
+        externalReference: user.id, // Antes estava user.email, agora manda o ID correto para o Webhook ler
+        // ---------------------
+        
         postalService: false
       })
     });
