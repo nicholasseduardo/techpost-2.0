@@ -417,9 +417,7 @@ const App: React.FC = () => {
                 <p className="text-slate-300 mb-8 text-sm sm:text-lg leading-relaxed max-w-lg">
                   Estamos oferecendo o plano vitalício com {' '}
                   <span className="font-black text-blue-400">70%</span>
-                  {' '} de desconto e{' '}
-                  <span className="font-black text-blue-400">pagamento único</span>
-                  {' '}para os 100 primeiros usuários, não perca essa oportunidade!
+                  {' '} de desconto para os 100 primeiros usuários, não perca essa oportunidade!
                 </p>
 
                 {/* ÁREA DO PREÇO */}
@@ -435,6 +433,7 @@ const App: React.FC = () => {
                     <span className="text-6xl sm:text-7xl font-black text-blue-500 tracking-tighter drop-shadow-lg">
                       14,90
                     </span>
+                    <span className="text-4xl font-bold text-blue-500">/mês</span>
                   </div>
                 </div>
 
@@ -469,7 +468,7 @@ const App: React.FC = () => {
 
                     <h3 className="text-xl font-bold text-white mb-2">Quase lá! 🚀</h3>
                     <p className="text-slate-400 text-sm mb-6">
-                      Para emitir sua nota fiscal e liberar o acesso, precisamos do seu CPF.
+                      Para emitir sua nota fiscal e liberar o acesso, precisamos do seu CPF. Essas informações não ficam guardadas!
                     </p>
 
                     {/* Input de CPF */}
