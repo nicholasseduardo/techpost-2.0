@@ -2,10 +2,17 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-  
-  // 🚨 NOVA REGRA: O "Crachá VIP" para o Webhook
-  // Se a rota começar com /api/webhook, deixa passar direto sem checar login
-  if (request.nextUrl.pathname.startsWith('/api/webhook')) {
+
+  const path = request.nextUrl.pathname  
+  // ROTAS PÚBLICAS (Sem verificação de Login)
+  // 1. Webhooks do Asaas
+  // 2. Landing Page de Teste (/landing)
+  if (
+    request.nextUrl.pathname.startsWith('/api/webhook') ||
+    path === '/' ||
+    request.nextUrl.pathname.startsWith('/privacy') ||
+    request.nextUrl.pathname.startsWith('/terms')
+  ) {
     return NextResponse.next()
   }
 
