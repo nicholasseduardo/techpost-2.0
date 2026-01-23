@@ -186,7 +186,7 @@ export default function LandingPage() {
             />
             <FeatureCard 
               icon={<CheckCircle2 size={28} className="text-emerald-400" />}
-              title="Formato LinkedIn Ready"
+              title="Linguagem otimizada"
               desc="Hooks virais, expressões naturais e Call to Actions (CTA) otimizados para engajar o seu público."
             />
           </div>
