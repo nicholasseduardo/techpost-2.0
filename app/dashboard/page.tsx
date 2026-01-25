@@ -6,14 +6,9 @@ import Sidebar from '../components/Sidebar';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { 
-  SocialNetwork, 
-  TargetAudience, 
-  PostObjective, 
-  PostTone, 
-  GeneratedPost,
-  GenerationParams
-} from '../types';
+import RepoSelector from '../components/RepoSelector'; 
+import { SocialNetwork, TargetAudience, PostObjective, PostTone, GeneratedPost, GenerationParams } from '../types';
+import { Link2 } from 'lucide-react';
 
 const App: React.FC = () => {
   // CONFIGURAÇÕES E HOOKS INICIAIS
@@ -49,10 +44,11 @@ const App: React.FC = () => {
   const [length, setLength] = useState<PostLength>('MEDIUM');
   const [context, setContext] = useState('');
   const [filesData, setFilesData] = useState<{ name: string; base64: string; mimeType: string }[]>([]);
+  const [repoUrl, setRepoUrl] = useState('');
   const contextSuggestions = [
     { label: "🚀 Lançamento", text: "Gostaria de anunciar uma nova funcionalidade no meu produto que resolve [PROBLEMA]. O tom deve ser empolgante." },
     { label: "🤔 Reflexão", text: "Uma reflexão sobre os desafios de ser engenheiro júnior e a importância da constância nos estudos." },
-    { label: "🎓 Tutorial", text: "Um passo a passo ensinando como resolver [ERRO TÉCNICO] usando [TECNOLOGIA]." },
+    { label: "🎓 Tutorial", text: "Um passo a passo ensinando como resolver [ERRO TÉCNICO] usando [TECNOLOGIA USADA]." },
     { label: "🔥 Polêmica", text: "Por que eu acho que [FERRAMENTA POPULAR] está sendo superestimada pelo mercado atualmente." },
   ];
 
@@ -256,7 +252,8 @@ const App: React.FC = () => {
           tone,
           length,
           context,
-          filesData: filesData.length > 0 ? filesData : undefined 
+          filesData: filesData.length > 0 ? filesData : undefined,
+          repoUrl: repoUrl,
         }),
       });
       
@@ -502,20 +499,19 @@ const App: React.FC = () => {
           )}
 
 
-        {/* --- NOVO LAYOUT "BLOCO COMPACTO" --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
             
-            {/* BLOCO DA ESQUERDA: SELETORES (Ocupa 8 colunas) */}
-            <div className="lg:col-span-8 flex flex-col justify-between gap-2 ">
+            {/* COLUNA DA ESQUERDA: Todos os Seletores + GitHub */}
+            <div className="lg:col-span-8 flex flex-col gap-2">
                 
-                {/* LINHA 1: 3 Seletores */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {/* LINHA 1: Canal, Público, Objetivo */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Canal</label>
                         <select 
                           value={channel} 
                           onChange={(e) => setChannel(e.target.value as SocialNetwork)}
-                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200 transition-all hover:border-slate-700"
                         >
                           {Object.values(SocialNetwork).map(v => <option key={v} value={v}>{v}</option>)}
                         </select>
@@ -526,7 +522,7 @@ const App: React.FC = () => {
                         <select 
                           value={audience}
                           onChange={(e) => setAudience(e.target.value as TargetAudience)}
-                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200 transition-all hover:border-slate-700"
                         >
                           {Object.values(TargetAudience).map(v => <option key={v} value={v}>{v}</option>)}
                         </select>
@@ -537,21 +533,21 @@ const App: React.FC = () => {
                         <select 
                           value={objective}
                           onChange={(e) => setObjective(e.target.value as PostObjective)}
-                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200 transition-all hover:border-slate-700"
                         >
                           {Object.values(PostObjective).map(v => <option key={v} value={v}>{v}</option>)}
                         </select>
                     </div>
                 </div>
 
-                {/* LINHA 2: 2 Seletores (Espandidos para preencher a largura) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* LINHA 2: Tom e Tamanho */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tom de Voz</label>
                         <select 
                           value={tone}
                           onChange={(e) => setTone(e.target.value as PostTone)}
-                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200 transition-all hover:border-slate-700"
                         >
                           {Object.values(PostTone).map(v => <option key={v} value={v}>{v}</option>)}
                         </select>
@@ -562,7 +558,7 @@ const App: React.FC = () => {
                         <select 
                           value={length}
                           onChange={(e) => setLength(e.target.value as PostLength)}
-                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+                          className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200 transition-all hover:border-slate-700"
                         >
                            <option value="SHORT">Curto (Post Rápido)</option>
                            <option value="MEDIUM">Médio (Padrão)</option>
@@ -570,41 +566,65 @@ const App: React.FC = () => {
                         </select>
                     </div>
                 </div>
+
+                {/* LINHA 3: GitHub (Input e Botão Lado a Lado) */}
+                <div className="space-y-2">
+                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                         Link do Repositório (GitHub)
+                     </label>
+
+                     {/* Container Flex para colocar um do lado do outro com espaçamento (gap-3) */}
+                     <div className="flex items-start gap-3">
+                         
+                         {/* O Input toma todo o espaço restante (flex-1) */}
+                         <div className="relative group flex-1">
+                             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors">
+                                 <Link2 size={18} />
+                             </div>
+                             <input 
+                                 type="url"
+                                 value={repoUrl}
+                                 onChange={(e) => setRepoUrl(e.target.value)}
+                                 placeholder="https://github.com/usuario/projeto"
+                                 // Mantém o estilo dos outros inputs
+                                 className="w-full bg-[#0a101f]/80 border border-slate-800/80 rounded-lg p-3 pl-10 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all hover:border-slate-700"
+                             />
+                         </div>
+
+                         {/* O botão fica com tamanho fixo ao lado */}
+                         <div className="flex-none">
+                            {/* Dependendo de como o componente RepoSelector foi feito, talvez precise de um pequeno ajuste de margem aqui, ex: className="-mt-1" se ele parecer desalinhado verticalmente */}
+                            <RepoSelector onSelect={(url) => setRepoUrl(url)} />
+                         </div>
+                     </div>
+                </div>
+
             </div>
 
-            {/* BLOCO DA DIREITA: ANEXOS (Ocupa 4 colunas e Altura Total) */}
-            <div className="lg:col-span-4 space-y-2 flex flex-col">
-               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anexos de Referência</label>
-               <div className="relative group cursor-pointer flex-1 min-h-[130px]">
-                  <input 
-                    type="file" 
-                    multiple 
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="w-full h-full bg-[#0a101f]/30 border border-dashed border-slate-800 group-hover:border-blue-500/50 rounded-xl flex flex-col items-center justify-center transition-all p-4 text-center">
-                     <div className="p-3 bg-slate-900/50 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                     </div>
-                     <p className="text-xs font-semibold text-slate-300">Arraste ou clique para upload</p>
-                     <p className="text-[9px] text-slate-500 mt-1">PDF, PNG, JPG (Múltiplos)</p>
-                  </div>
-               </div>
-
-               {/* Lista de Arquivos Miniatura */}
-               {filesData.length > 0 && (
-                 <div className="flex flex-wrap gap-2 mt-1">
-                   {filesData.map((file, index) => (
-                     <div key={index} className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-1 rounded text-[10px] font-medium max-w-full">
-                        <span className="truncate flex-1 max-w-[120px]">{file.name}</span>
-                        <button onClick={() => removeFile(index)} className="hover:text-red-400">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                     </div>
-                   ))}
-                 </div>
-               )}
+            {/* 🔵 COLUNA DA DIREITA (4/12): Apenas Upload (Mais alto e limpo) */}
+            <div className="lg:col-span-4 flex flex-col h-full min-h-[300px] lg:min-h-0">
+                <div className="flex-1 flex flex-col space-y-2 h-full">
+                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anexos de Referência</label>
+                   
+                   <div className="relative group cursor-pointer flex-1 h-full">
+                      <input 
+                        type="file" 
+                        multiple 
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
+                      {/* O container visual agora cresce com h-full */}
+                      <div className="w-full h-full bg-[#0a101f]/30 border border-dashed border-slate-800 group-hover:border-blue-500/50 rounded-xl flex flex-col items-center justify-center transition-all p-6 text-center hover:bg-[#0a101f]/50">
+                          <div className="p-4 bg-slate-900/50 rounded-full mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-blue-900/10">
+                             <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                          </div>
+                          <p className="text-sm font-bold text-slate-300">Arraste arquivos aqui</p>
+                          <p className="text-[11px] text-slate-500 mt-1">Imagens, PDFs, Docs</p>
+                      </div>
+                   </div>
+                </div>
             </div>
+
         </div>
 
         {/* --- ÁREA DE CONTEXTO --- */}

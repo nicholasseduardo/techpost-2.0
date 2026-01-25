@@ -4,14 +4,14 @@ import { updateSession } from '@/utils/supabase/middleware'
 export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname  
-  // ROTAS PÚBLICAS (Sem verificação de Login)
-  // 1. Webhooks do Asaas
-  // 2. Landing Page de Teste (/landing)
+// 🚨 ROTAS PÚBLICAS (Acesso Liberado sem Login)
   if (
-    request.nextUrl.pathname.startsWith('/api/webhook') ||
-    path === '/' ||
-    request.nextUrl.pathname.startsWith('/privacy') ||
-    request.nextUrl.pathname.startsWith('/terms')
+    path.startsWith('/api/webhook') || 
+    path === '/' ||                    
+    path.startsWith('/auth') ||        
+    path.startsWith('/privacy') ||     
+    path.startsWith('/terms') ||
+    path.startsWith('/login')
   ) {
     return NextResponse.next()
   }

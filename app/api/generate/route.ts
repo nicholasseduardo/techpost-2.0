@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { createClient } from "../../../utils/supabase/server";
+import { getRepoContent } from "../../../utils/githubLoader"; 
 
 export async function POST(req: Request) {
   try {
@@ -25,7 +26,6 @@ export async function POST(req: Request) {
     const FREE_LIMIT = 2; 
 
     // Verifica se deve bloquear
-    // Se (Perfil existe) E (NÃO é VIP) E (Contagem >= Limite)
     if (profile && !profile.is_vip && (profile.usage_count || 0) >= FREE_LIMIT) {
       return NextResponse.json(
         { error: "Limite gratuito atingido." }, 
@@ -42,8 +42,18 @@ export async function POST(req: Request) {
       );
     }
 
-    // --- NOVA LÓGICA DE ENTRADA (Múltiplos arquivos + Tamanho) ---
-    const { channel, audience, objective, tone, length, context, filesData } = await req.json();
+    // 👇 AQUI COMEÇA A MUDANÇA (Raio-X)
+    const body = await req.json();
+    const { channel, audience, objective, tone, length, context, filesData, repoUrl } = body;
+
+    console.log("-------------------------------------------------");
+    console.log("📡 [DEBUG] Recebido no Backend:");
+    console.log("🔗 RepoURL:", repoUrl); // <--- O link chegou aqui?
+    console.log("📝 Contexto Usuário:", context);
+
+
+    // --------------------
+
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -61,6 +71,22 @@ export async function POST(req: Request) {
         lengthInstruction = "Tamanho médio. Entre 3 a 4 parágrafos. Equilibrado entre profundidade e fluidez.";
     }
 
+    // 👇 DEBUG NA HORA DE BAIXAR O GITHUB
+    let githubContext = "";
+    if (repoUrl && repoUrl.includes('github.com')) {
+      console.log("⏳ [DEBUG] Iniciando download do GitHub...");
+      try {
+        githubContext = await getRepoContent(repoUrl);
+        console.log("✅ [DEBUG] Download concluído!");
+        console.log(`📦 [DEBUG] Tamanho do Contexto GitHub: ${githubContext.length} caracteres`);
+        console.log("📜 [DEBUG] Preview do início:", githubContext.slice(0, 100)); // Mostra o comecinho
+      } catch (err) {
+        console.error("❌ [DEBUG] Erro ao baixar GitHub:", err);
+      }
+    } else {
+      console.log("⚠️ [DEBUG] Nenhuma URL de GitHub válida detectada.");
+    }
+
     // --- NOVO PROMPT ---
     const promptText = `
       Você é um especialista em Copyrighting e Ghostwriter trabalhando para CTOs e Engenheiros Sêniores.
@@ -71,8 +97,10 @@ export async function POST(req: Request) {
       - Objetivo: ${objective}
       - Tom de Voz: ${tone}
       - Tamanho Obrigatório: ${lengthInstruction}
-      - Contexto do Usuário: "${context}"
-
+      
+      CONTEXTO DO USUÁRIO (Ideias/Rascunhos):
+      "${context}"
+      ${githubContext ? `\nCONTEXTO TÉCNICO EXTRAÍDO DO GITHUB (Use isso como base principal):\n${githubContext}\n` : ""}
       ${filesData && filesData.length > 0 ? "IMPORTANTE: Use os arquivos anexados como fonte principal de informação técnica." : ""}
 
       ESTRUTURA OBRIGATÓRIA:
@@ -82,6 +110,7 @@ export async function POST(req: Request) {
          - Hook (Gancho) polêmico ou técnico.
          - Desenvolvimento claro da solução.
          - CTA (Chamada para ação).
+         - Adicione Hashtags se for para o Instagram
 
       REGRAS DE ESTILO:
       - Sem negrito (**texto**). Apenas texto puro.
@@ -114,17 +143,15 @@ export async function POST(req: Request) {
     const fullText = response.text();
 
     const parts = fullText.split('\n');
-    const title = parts[0].trim(); // A primeira linha é o título
-    // O resto é o conteúdo (juntamos de volta pulando a primeira linha)
-
+    const title = parts[0].trim();
     const content = parts.slice(1).join('\n').trim();
 
-    // Salva no Supabase (Note que agora salvamos 'title' e 'content' separado)
+    // Salva no Supabase
     const { error: dbError } = await supabase.from('posts').insert({
         user_id: user.id,
-        context_prompt: context, // Usamos 'context' direto, sem 'data.'
-        audience: audience,      // Usamos 'audience' direto
-        tone: tone,              // Usamos 'tone' direto
+        context_prompt: context,
+        audience: audience,      
+        tone: tone,              
         title: title || "Sem Título",
         generated_text: content || fullText 
     });
