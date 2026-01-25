@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'; // Importante para os links
+import { Github } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,21 @@ export default function LoginPage() {
   
   const router = useRouter();
   const supabase = createClient();
+
+  const handleGithubLogin = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${location.origin}/auth/callback`, 
+      },
+    });
+
+    if (error) {
+      setMessage(error.message);
+      setLoading(false);
+    }
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +95,21 @@ export default function LoginPage() {
         <h1 className="mb-6 text-2xl font-bold text-center text-blue-500">
           {isSignUp ? 'Criar Conta TechPost' : 'Acessar'}
         </h1>
+
+        <button
+          type="button" // Importante ser type="button" para não enviar o formulário
+          onClick={handleGithubLogin}
+          className="w-full flex items-center justify-center gap-2 bg-[#24292e] hover:bg-[#2b3137] text-white p-3 rounded-lg font-bold transition-all mb-4 border border-white/10"
+        >
+          <Github size={20} />
+          Conectar com GitHub
+        </button>
+
+        <div className="relative flex py-2 items-center mb-6">
+          <div className="flex-grow border-t border-gray-700"></div>
+          <span className="flex-shrink-0 mx-4 text-gray-500 text-sm">ou via e-mail</span>
+          <div className="flex-grow border-t border-gray-700"></div>
+        </div>
 
         <form onSubmit={handleAuth} className="space-y-4">
           {isSignUp && (
