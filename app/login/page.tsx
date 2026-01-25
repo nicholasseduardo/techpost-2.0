@@ -10,18 +10,24 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [usageType, setUsageType] = useState('personal'); // Mudei o default para evitar erro de string vazia
+  const [usageType, setUsageType] = useState('personal');
   const [isSignUp, setIsSignUp] = useState(false); 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
-  // NOVO: Estado para o checkbox de termos
+  // Estado para o checkbox de termos
   const [agreed, setAgreed] = useState(false);
   
   const router = useRouter();
   const supabase = createClient();
 
   const handleGithubLogin = async () => {
+
+    if (isSignUp && !agreed) {
+      setMessage("Para se cadastrar, você precisa concordar com os Termos e Política de Privacidade.");
+      return; 
+    }
+
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
@@ -104,6 +110,10 @@ export default function LoginPage() {
           <Github size={20} />
           Conectar com GitHub
         </button>
+
+        <p className="text-[10px] text-gray-500 text-center mb-4 px-2">
+          Ao continuar, você concorda automaticamente com nossos <Link href="/terms" className="underline hover:text-blue-400">Termos de Uso</Link> e <Link href="/privacy" className="underline hover:text-blue-400">Política de Privacidade</Link>.
+        </p>
 
         <div className="relative flex py-2 items-center mb-6">
           <div className="flex-grow border-t border-gray-700"></div>
