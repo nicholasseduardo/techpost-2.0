@@ -6,20 +6,21 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link'; // Importante para os links
 import { Github } from "lucide-react";
 
+
 export default function LoginPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [usageType, setUsageType] = useState('personal');
-  const [isSignUp, setIsSignUp] = useState(false); 
+  const [isSignUp, setIsSignUp] = useState(true);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
   // Estado para o checkbox de termos
   const [agreed, setAgreed] = useState(false);
-  
-  const router = useRouter();
-  const supabase = createClient();
 
   const handleGithubLogin = async () => {
 
@@ -122,30 +123,6 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleAuth} className="space-y-4">
-          {isSignUp && (
-            <div>
-              <label className="block text-sm text-gray-400">Nome</label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded bg-gray-800 p-2 border border-gray-700 focus:border-blue-500 outline-none mb-3"
-                required
-              />
-              <label className="block text-sm text-gray-400 mb-1">Como você vai usar?</label>
-              <select
-                value={usageType}
-                onChange={(e) => setUsageType(e.target.value)}
-                className="w-full rounded bg-gray-800 p-2 border border-gray-700 focus:border-blue-500 outline-none text-white"
-              >
-                <option value="personal">Uso Pessoal / Hobby</option>
-                <option value="student">Estudante / Acadêmico</option>
-                <option value="corporate">Profissional / Corporativo</option>
-                <option value="creator">Criador de Conteúdo</option>
-              </select>
-            </div>
-          )}
-
           <div>
             <label className="block text-sm text-gray-400">E-mail</label>
             <input
