@@ -60,37 +60,38 @@ export default function LandingPage() {
                     </span>
                 </Link>
             </div>
-
-            <div className="mt-16 relative w-full rounded-xl shadow-2xl border border-gray-800 bg-gray-900/50 p-2 backdrop-blur-sm animate-fade-in-up">
-            <video
-              className="w-full rounded-lg shadow-lg"
-              autoPlay
-              muted
-              loop
-              playsInline
-              controls // Adiciona a barra de controle para o usuário ativar o som
-            >
-              <source src="/Demo.mp4" type="video/mp4" />
-              Seu navegador não suporta a tag de vídeo.
-            </video>
-          </div>
-
         </div>
       </section>
 
 
       {/* --- DEMO / FLUXOGRAMA MINIMALISTA V3 (Final) --- */}
       <section className="px-6 pb-24">
-        <div className="max-w-5xl mx-auto">
-          
+        <div className="max-w-6xl mx-auto">
           {/* TÍTULO DA SEÇÃO */}
-          <div className="text-center mb-20 space-y-4">
+          <div className="text-center mb-16 space-y-4">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
               Como Funciona
             </h2>
             <p className="text-slate-400 max-w-lg mx-auto">
               Simples, rápido e direto ao ponto. Do seu código para o LinkedIn em segundos.
             </p>
+          </div>
+
+          <div className="mt-10 mb-20 relative w-full rounded-xl shadow-2xl border border-gray-800 bg-gray-900/50 p-2 backdrop-blur-sm animate-fade-in-up">
+            <video
+              className="w-full rounded-lg shadow-lg"
+              autoPlay
+              muted
+              loop
+              playsInline // Essencial para iPhone
+              webkit-playsinline="true" // Adicione essa linha extra para garantir suporte em iOS antigo
+              controls 
+              poster="/thumbnail-video2.jpg" // 👈 A SALVAÇÃO: Imagem de capa
+              preload="metadata" // Carrega só o básico primeiro pra não travar o site
+            >
+              <source src="/demo.mp4" type="video/mp4" />
+              Seu navegador não suporta a tag de vídeo.
+            </video>
           </div>
 
           <div className="relative flex flex-col md:flex-row items-center justify-between gap-12 md:gap-0">
