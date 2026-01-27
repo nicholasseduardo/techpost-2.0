@@ -676,49 +676,50 @@ const App: React.FC = () => {
                       <p className="text-[11px] text-slate-500 mt-1">Imagens, PDFs, Docs</p>
                    </div>
 
-                   {/* LISTA DE ARQUIVOS COM MINIATURA */}
+                   {/* GALERIA DE ARQUIVOS (GRID) */}
                    {filesData.length > 0 && (
-                      <div className="flex flex-col gap-2 mt-3 max-h-[150px] overflow-y-auto pr-1 custom-scrollbar">
+                      <div className="flex flex-wrap gap-3 mt-4 animate-fade-in">
                         {filesData.map((file, index) => {
-                          // Verifica se é imagem olhando o MIME type (ex: "image/png", "image/jpeg")
                           const isImage = file.mimeType.startsWith('image/');
+                          const extension = file.name.split('.').pop()?.slice(0, 4).toUpperCase() || 'DOC';
 
                           return (
-                            <div key={index} className="flex items-center justify-between bg-[#0a101f]/50 p-2 rounded-lg border border-slate-800 group hover:border-blue-500/30 transition-all">
-                              <div className="flex items-center gap-3 overflow-hidden">
-                                {/* CONDICIONAL: Mostra miniatura se for imagem, ou ícone se for doc */}
-                                {isImage ? (
-                                  <img 
-                                    src={file.base64} 
-                                    alt={file.name} 
-                                    className="h-10 w-10 object-cover rounded-md border border-slate-700"
-                                  />
-                                ) : (
-                                  <div className="h-10 w-10 flex items-center justify-center bg-slate-800 rounded-md border border-slate-700 text-slate-400">
-                                    {/* Ícone genérico de documento (SVG) */}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                  </div>
-                                )}
-                                
-                                {/* Nome do arquivo truncado */}
-                                <div className="flex flex-col truncate">
-                                  <span className="text-xs text-slate-300 truncate font-medium" title={file.name}>
-                                    {file.name}
-                                  </span>
-                                  {/* Mostra o tipo do arquivo (opcional) */}
-                                  <span className="text-[10px] text-slate-500 uppercase tracking-wider">
-                                     {file.mimeType.split('/')[1] || 'FILE'}
-                                  </span>
+                            <div 
+                              key={index} 
+                              className="relative group w-16 h-16" // Tamanho fixo para o quadrado
+                              title={file.name} // Tooltip nativo com o nome do arquivo
+                            >
+                              
+                              {/* --- CONTEÚDO (IMAGEM OU ÍCONE) --- */}
+                              {isImage ? (
+                                <img 
+                                  src={file.base64} 
+                                  alt={file.name} 
+                                  className="w-full h-full object-cover rounded-sm border border-slate-700 shadow-sm bg-slate-900"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-[#0a101f] rounded-xl border border-slate-700 text-slate-500 shadow-sm">
+                                  {/* Ícone menor para caber no quadrado */}
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                  {/* Extensão do arquivo (PDF, TXT) */}
+                                  <span className="text-[8px] font-bold mt-1">{extension}</span>
                                 </div>
-                              </div>
+                              )}
 
-                              {/* Botão de Remover */}
+                              {/* --- BOTÃO DE REMOVER (BADGE NO CANTO) --- */}
                               <button 
                                 onClick={(e) => { e.stopPropagation(); removeFile(index); }}
-                                className="p-1 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors opacity-0 group-hover:opacity-100"
-                                title="Remover arquivo"
+                                className="
+                                  absolute -top-2 -right-2 z-10
+                                  h-5 w-5 rounded-full
+                                  bg-grey-500 text-white
+                                  flex items-center justify-center
+                                  shadow-md hover:bg-red-800 hover:scale-110 transition-all
+                                  cursor-pointer
+                                "
+                                title="Remover"
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                               </button>
                             </div>
                           );
