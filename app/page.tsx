@@ -35,13 +35,13 @@ export default function LandingPage() {
         {/* Efeitos de Fundo (Glow) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] -z-10 opacity-50" />
         
-        <div className="max-w-4xl mx-auto text-center space-y-10">
+        <div className="max-w-6xl mx-auto text-center space-y-10">
           <div className="flex justify-center mb-25">
             <img src="/WideLogo.png" alt="TechPost Logo" className="h-60 w-auto object-contain" />
           </div>
 
           {/* Título (Reduzi um pouco o tamanho para text-4xl no mobile e text-6xl no desktop) */}
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] max-w-4xl mx-auto">
             Transforme seus <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">projetos</span> em autoridade nas redes sociais.
           </h1>
           
@@ -59,7 +59,22 @@ export default function LandingPage() {
                     Criar meu 1º Post Grátis
                     </span>
                 </Link>
-            </div>  
+            </div>
+
+            <div className="mt-16 relative w-full rounded-xl shadow-2xl border border-gray-800 bg-gray-900/50 p-2 backdrop-blur-sm animate-fade-in-up">
+            <video
+              className="w-full rounded-lg shadow-lg"
+              autoPlay
+              muted
+              loop
+              playsInline
+              controls // Adiciona a barra de controle para o usuário ativar o som
+            >
+              <source src="/Demo.mp4" type="video/mp4" />
+              Seu navegador não suporta a tag de vídeo.
+            </video>
+          </div>
+
         </div>
       </section>
 
