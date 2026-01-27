@@ -89,7 +89,7 @@ export default function LandingPage() {
               poster="/thumbnail-video2.jpg" // 👈 A SALVAÇÃO: Imagem de capa
               preload="metadata" // Carrega só o básico primeiro pra não travar o site
             >
-              <source src="/demo.mp4" type="video/mp4" />
+              <source src="/Demo.mp4" type="video/mp4" />
               Seu navegador não suporta a tag de vídeo.
             </video>
           </div>
