@@ -45,12 +45,18 @@ const App: React.FC = () => {
   const [context, setContext] = useState('');
   const [filesData, setFilesData] = useState<{ name: string; base64: string; mimeType: string }[]>([]);
   const [repoUrl, setRepoUrl] = useState('');
+  
   const contextSuggestions = [
     { label: "🚀 Lançamento", text: "Gostaria de anunciar uma nova funcionalidade no meu produto que resolve [PROBLEMA]. O tom deve ser empolgante." },
     { label: "🤔 Reflexão", text: "Uma reflexão sobre os desafios de ser engenheiro júnior e a importância da constância nos estudos." },
     { label: "🎓 Tutorial", text: "Um passo a passo ensinando como resolver [ERRO TÉCNICO] usando [TECNOLOGIA USADA]." },
     { label: "🔥 Polêmica", text: "Por que eu acho que [FERRAMENTA POPULAR] está sendo superestimada pelo mercado atualmente." },
   ];
+
+  // Ref para clicar no input escondido via código
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Estado para mudar a cor da borda quando estiver arrastando
+  const [isDragging, setIsDragging] = useState(false);
 
   // REFERÊNCIA PARA O SCROLL AUTOMÁTICO
   const resultRef = useRef<HTMLDivElement>(null);
@@ -194,35 +200,64 @@ const App: React.FC = () => {
     router.push('/login');
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      // Cria uma promessa para ler cada arquivo
-      const fileReaders = Array.from(files).map(file => {
-        return new Promise<{ name: string; base64: string; mimeType: string }>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve({
-              name: file.name,
-              base64: reader.result as string,
-              mimeType: file.type
-            });
-          };
-          reader.readAsDataURL(file);
-        });
-      });
+  // 1. Função que processa os arquivos (Reutilizável)
+  const processFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
 
-      // Quando todos forem lidos, atualiza o estado
-      Promise.all(fileReaders).then(newFiles => {
-        // Adiciona aos que já existem (ou substitui, se preferir setFilesData(newFiles))
-        setFilesData(prev => [...prev, ...newFiles]);
+    const fileReaders = Array.from(files).map(file => {
+      return new Promise<{ name: string; base64: string; mimeType: string }>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve({
+            name: file.name,
+            base64: reader.result as string,
+            mimeType: file.type
+          });
+        };
+        reader.readAsDataURL(file);
       });
+    });
+
+    Promise.all(fileReaders).then(newFiles => {
+      setFilesData(prev => [...prev, ...newFiles]);
+    });
+  };
+
+  // 2. Handler do Input (Clique)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    processFiles(e.target.files);
+    // Reseta o input para permitir selecionar o mesmo arquivo novamente se precisar
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // 3. Handlers de Drag & Drop (O segredo para funcionar o arrastar)
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    // Pega os arquivos do evento de DROP (dataTransfer)
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
+      e.dataTransfer.clearData();
     }
   };
 
-  // Função para remover um arquivo da lista
-  const removeFile = (index: number) => {
-    setFilesData(prev => prev.filter((_, i) => i !== index));
+  // Função para remover arquivo da lista (UX básica)
+  const removeFile = (indexToRemove: number) => {
+    setFilesData(prev => prev.filter((_, index) => index !== indexToRemove));
   };
 
   const handleGenerate = async () => {
@@ -606,22 +641,90 @@ const App: React.FC = () => {
                 <div className="flex-1 flex flex-col space-y-2 h-full">
                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Anexos de Referência</label>
                    
-                   <div className="relative group cursor-pointer flex-1 h-full">
-                      <input 
+                   {/* Input invisível fora do fluxo visual */}
+                   <input 
                         type="file" 
                         multiple 
-                        onChange={handleFileChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        ref={fileInputRef}
+                        onChange={handleInputChange}
+                        className="hidden" 
+                        accept=".pdf,.doc,.docx,.txt,image/*"
                       />
-                      {/* O container visual agora cresce com h-full */}
-                      <div className="w-full h-full bg-[#0a101f]/30 border border-dashed border-slate-800 group-hover:border-blue-500/50 rounded-xl flex flex-col items-center justify-center transition-all p-6 text-center hover:bg-[#0a101f]/50">
-                          <div className="p-4 bg-slate-900/50 rounded-full mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-blue-900/10">
-                             <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                          </div>
-                          <p className="text-sm font-bold text-slate-300">Arraste arquivos aqui</p>
-                          <p className="text-[11px] text-slate-500 mt-1">Imagens, PDFs, Docs</p>
+
+                   <div 
+                      // Eventos conectados
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()} // Transfere o clique para o input
+                      
+                      // Estilização dinâmica
+                      className={`
+                        flex-1 w-full h-full border border-dashed rounded-xl flex flex-col items-center justify-center transition-all p-6 text-center cursor-pointer
+                        ${isDragging 
+                          ? 'border-blue-500 bg-blue-500/20' // Estilo quando arrasta por cima
+                          : 'bg-[#0a101f]/30 border-slate-800 hover:border-blue-500/50 hover:bg-[#0a101f]/50' // Estilo normal
+                        }
+                      `}
+                   >
+                      <div className={`p-4 bg-slate-900/50 rounded-full mb-4 transition-transform shadow-lg shadow-blue-900/10 ${isDragging ? 'scale-110' : 'group-hover:scale-110'}`}>
+                         <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                       </div>
+                      <p className="text-sm font-bold text-slate-300">
+                        {isDragging ? "Solte para enviar" : "Arraste arquivos aqui"}
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-1">Imagens, PDFs, Docs</p>
                    </div>
+
+                   {/* LISTA DE ARQUIVOS COM MINIATURA */}
+                   {filesData.length > 0 && (
+                      <div className="flex flex-col gap-2 mt-3 max-h-[150px] overflow-y-auto pr-1 custom-scrollbar">
+                        {filesData.map((file, index) => {
+                          // Verifica se é imagem olhando o MIME type (ex: "image/png", "image/jpeg")
+                          const isImage = file.mimeType.startsWith('image/');
+
+                          return (
+                            <div key={index} className="flex items-center justify-between bg-[#0a101f]/50 p-2 rounded-lg border border-slate-800 group hover:border-blue-500/30 transition-all">
+                              <div className="flex items-center gap-3 overflow-hidden">
+                                {/* CONDICIONAL: Mostra miniatura se for imagem, ou ícone se for doc */}
+                                {isImage ? (
+                                  <img 
+                                    src={file.base64} 
+                                    alt={file.name} 
+                                    className="h-10 w-10 object-cover rounded-md border border-slate-700"
+                                  />
+                                ) : (
+                                  <div className="h-10 w-10 flex items-center justify-center bg-slate-800 rounded-md border border-slate-700 text-slate-400">
+                                    {/* Ícone genérico de documento (SVG) */}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                  </div>
+                                )}
+                                
+                                {/* Nome do arquivo truncado */}
+                                <div className="flex flex-col truncate">
+                                  <span className="text-xs text-slate-300 truncate font-medium" title={file.name}>
+                                    {file.name}
+                                  </span>
+                                  {/* Mostra o tipo do arquivo (opcional) */}
+                                  <span className="text-[10px] text-slate-500 uppercase tracking-wider">
+                                     {file.mimeType.split('/')[1] || 'FILE'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Botão de Remover */}
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); removeFile(index); }}
+                                className="p-1 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors opacity-0 group-hover:opacity-100"
+                                title="Remover arquivo"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                   )}
                 </div>
             </div>
 
