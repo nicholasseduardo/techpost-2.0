@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       from: `"Nicholas do TechPost" <${process.env.GMAIL_USER}>`,
       to: userEmail,
       subject: "Bem-vindo ao TechPost! 🚀",
-      text: `Olá, ${newUser.full_name || 'Engenheiro'}!
+      text: `Opa! Tudo bem?
 
 Meu nome é Nicholas, sou o criador do TechPost IA. Vi que você acabou de criar sua conta e queria dar as boas-vindas pessoalmente.
 
