@@ -53,18 +53,7 @@ export default function RootLayout({
         <FeedbackButton /> 
 
         {/* --- NOVO RODAPÉ AQUI --- */}
-        <footer className="bg-[#0a101f] border-t border-slate-800 py-8 mt-auto">
-          <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-600 text-xs">
-              © 2026 TechPost IA. Todos os direitos reservados.
-            </p>
-            <div className="flex gap-6">
-              <a href="/terms" className="text-slate-500 hover:text-blue-400 text-xs transition-colors">Termos de Uso</a>
-              <a href="/privacy" className="text-slate-500 hover:text-blue-400 text-xs transition-colors">Privacidade</a>
-            </div>
-          </div>
-        </footer>
-
+        
         <Analytics />
 
       </body>

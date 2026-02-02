@@ -3,6 +3,15 @@ import { NextResponse } from "next/server";
 import { createClient } from "../../../utils/supabase/server";
 import { getRepoContent } from "../../../utils/githubLoader"; 
 
+function cleanText(text: string) {
+  return text
+    .replace(/```markdown/g, "")
+    .replace(/```/g, "")
+    .replace(/^## /g, "") // Remove titulo markdown se houver
+    .replace(/^\*\*Title:\*\*/i, "") // Remove prefixos comuns
+    .trim();
+}
+
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
@@ -56,7 +65,6 @@ export async function POST(req: Request) {
 
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // --- LÓGICA DE TAMANHO ---
     let lengthInstruction = "";
@@ -138,11 +146,37 @@ export async function POST(req: Request) {
       });
     }
 
-    const result = await model.generateContent(promptParts);
-    const response = await result.response;
-    const fullText = response.text();
+    // --- LÓGICA DE GERAÇÃO COM GEMMA 3 + FALLBACK ---
+    let fullText = "";
 
-    const parts = fullText.split('\n');
+    try {
+        console.log("🤖 [DEBUG] Tentando gerar com Gemma 3 27B...");
+        // Tenta usar o modelo de cota alta (14.4k req/dia)
+        const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
+        
+        const result = await model.generateContent(promptParts);
+        const response = await result.response;
+        fullText = cleanText(response.text());
+
+    } catch (gemmaError) {
+        console.error("⚠️ [DEBUG] Gemma 3 falhou. Tentando Fallback...");
+        
+        // Se falhar (ex: imagem não suportada), usa o Gemini 2.5 Flash (Super estável)
+        try {
+            console.log("🔄 [DEBUG] Usando Fallback: Gemini 2.5 Flash...");
+            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            
+            const result = await fallbackModel.generateContent(promptParts);
+            const response = await result.response;
+            fullText = cleanText(response.text());
+            
+        } catch (fallbackError) {
+             console.error("❌ [FATAL] Todos os modelos falharam.");
+             throw fallbackError;
+        }
+    }
+
+    const parts = fullText.split('\n').filter(line => line.trim() !== '');
     const title = parts[0].trim();
     const content = parts.slice(1).join('\n').trim();
 
@@ -151,7 +185,8 @@ export async function POST(req: Request) {
         user_id: user.id,
         context_prompt: context,
         audience: audience,      
-        tone: tone,              
+        tone: tone,
+        platform: channel,              
         title: title || "Sem Título",
         generated_text: content || fullText 
     });

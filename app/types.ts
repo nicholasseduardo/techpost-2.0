@@ -35,13 +35,18 @@ export interface GeneratedPost {
   id: string;
   topic: string;
   content: string;
-  timestamp: number;
-  config: {
+  
+  timestamp?: number;
+  config?: {
     channel: SocialNetwork;
     audience: TargetAudience;
     objective: PostObjective;
     tone: PostTone;
   };
+  
+  platform?: string;
+  style?: string;
+  createdAt?: Date;
 }
 
 export interface GenerationParams {

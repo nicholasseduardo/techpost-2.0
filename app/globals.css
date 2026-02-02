@@ -1,26 +1,54 @@
 @import "tailwindcss";
 
+@theme {
+  /* Cores personalizadas do TechPost baseadas no Design */
+  --color-tech-bg: #020617;      /* Fundo da página (quase preto, azulado) */
+  --color-tech-sidebar: #050a1f; /* Fundo da Sidebar */
+  --color-tech-card: #0f172a;    /* Fundo dos Cards */
+  --color-tech-highlight: #1d4ed8; /* Azul brilhante (botão ativo) */
+  --color-tech-gold: #f59e0b;    /* Dourado VIP */
+  
+  /* Gradiente Dourado */
+  --image-gold-gradient: linear-gradient(to bottom right, #fbbf24, #b45309);
+}
+
+/* Forçando o Dark Mode como padrão */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  background-color: var(--color-tech-bg);
+  color: #ffffff;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-tech-bg);
+  color: #ffffff;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* --- CUSTOM SCROLLBAR (DARK MODE) --- */
+@layer utilities {
+  /* Para Chrome, Edge e Safari */
+  ::-webkit-scrollbar {
+    width: 8px; /* Largura vertical */
+    height: 8px; /* Altura horizontal */
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #020617; /* Cor do fundo (Slate 950 - igual ao site) */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b; /* Cor da barra (Slate 800) */
+    border-radius: 9999px; /* Bordas arredondadas (Pill shape) */
+    border: 2px solid #020617; /* Cria uma margem interna para ficar bonito */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3b82f6; /* Fica azul (Blue 500) quando passa o mouse */
+  }
+
+  /* Para Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1e293b #020617;
+  }
 }
