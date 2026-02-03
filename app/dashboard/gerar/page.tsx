@@ -107,6 +107,11 @@ const GeneratorContent = () => {
         if (profile) {
           setIsVip(profile.is_vip || false);
           setUsageCount(profile.usage_count || 0);
+          // Aplica as preferências salvas no perfil (se existirem)
+          if (profile.default_channel) setChannel(profile.default_channel as SocialNetwork);
+          if (profile.default_audience) setAudience(profile.default_audience as TargetAudience);
+          if (profile.default_objective) setObjective(profile.default_objective as PostObjective);
+          if (profile.default_tone) setTone(profile.default_tone as PostTone);
         }
       }
     } catch (error) {
@@ -435,16 +440,16 @@ const GeneratorContent = () => {
         }),
       });
 
-      // --- NOVO: AQUI NÓS DETECTAMOS O BLOQUEIO ---
+      // DETECTA O BLOQUEIO 
       if (response.status === 403) {
-        setShowPaywall(true); // <--- Mostra a tela de Upgrade
-        setLoading(false);    // <--- Para o ícone de carregando
-        return;               // <--- Para tudo por aqui!
+        setShowPaywall(true); 
+        setLoading(false);    
+        return;              
       }
       // --------------------------------------------
 
       if (!response.ok) {
-        // Se não for 403 e der erro, aí sim é falha no servidor
+        // Se não for 403 e der erro, falha no servidor
         throw new Error('Falha ao conectar com o servidor');
       }
 

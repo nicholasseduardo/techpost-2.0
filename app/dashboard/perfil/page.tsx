@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { User, Zap, LogOut, Calendar, ShieldCheck } from "lucide-react";
+import { TargetAudience, PostTone, SocialNetwork, PostObjective } from "../../types";
 
 export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
@@ -14,9 +15,16 @@ export default function ProfilePage() {
     const supabase = createClient();
     const router = useRouter();
 
+    const [saving, setSaving] = useState(false);
+    const [formData, setFormData] = useState({
+        default_audience: 'Engenheiros', 
+        default_tone: 'Profissional',
+        default_channel: 'LinkedIn',  
+        default_objective: 'Autoridade' 
+    });
+
     useEffect(() => {
         const getData = async () => {
-            // 1. Pega o usuário logado (Auth)
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
@@ -25,7 +33,6 @@ export default function ProfilePage() {
             }
             setUser(user);
 
-            // 2. Pega os dados públicos (Tabela profiles)
             const { data } = await supabase
                 .from("profiles")
                 .select("*")
@@ -33,6 +40,15 @@ export default function ProfilePage() {
                 .single();
 
             setProfile(data);
+            if (data) {
+        setFormData({
+            default_audience: data.default_audience || 'Engenheiros',
+            default_tone: data.default_tone || 'Profissional',
+            default_channel: data.default_channel || 'LinkedIn',
+            default_objective: data.default_objective || 'Autoridade'
+        });
+    }
+
             setLoading(false);
         };
         getData();
@@ -42,6 +58,32 @@ export default function ProfilePage() {
         await supabase.auth.signOut();
         router.push("/login");
     };
+
+
+    const handleSavePreferences = async () => {
+        if (!user) return;
+        setSaving(true);
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    default_audience: formData.default_audience,
+                    default_tone: formData.default_tone,
+                    default_channel: formData.default_channel,
+                    default_objective: formData.default_objective
+                })
+                .eq('id', user.id);
+
+            if (error) throw error;
+            alert("Preferências atualizadas com sucesso! 💾");
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao salvar preferências.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
 
     if (loading) {
         return (
@@ -87,21 +129,92 @@ export default function ProfilePage() {
 
                             <div className="flex flex-wrap justify-center sm:justify-start gap-3">
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300">
-                                    <User size={14} /> Conta Pessoal
-                                </span>
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300">
                                     <Calendar size={14} /> Entrou em {new Date(user?.created_at).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Configurações (Placeholder para o futuro) */}
-                    <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-6 opacity-50 pointer-events-none grayscale">
-                        <h3 className="text-lg font-bold text-white mb-4">Preferências (Em breve)</h3>
-                        <div className="space-y-3">
-                            <div className="h-10 bg-slate-800/50 rounded-lg w-full"></div>
-                            <div className="h-10 bg-slate-800/50 rounded-lg w-2/3"></div>
+                    {/* --- CARD DE PREFERÊNCIAS (FUNCIONAL) --- */}
+                    <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-8 shadow-sm">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                <span className="text-blue-500">⚙️</span> Preferências de IA
+                            </h2>
+                            {saving && <span className="text-xs text-green-400 animate-pulse font-bold">SALVANDO...</span>}
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                
+                                {/* 1. CANAL PADRÃO (NOVO) */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Canal / Rede Social</label>
+                                    <select 
+                                        value={formData.default_channel}
+                                        onChange={(e) => setFormData({...formData, default_channel: e.target.value})}
+                                        className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:border-blue-500 outline-none transition-all"
+                                    >
+                                        {Object.values(SocialNetwork).map((net) => (
+                                            <option key={net} value={net} className="bg-[#0f172a]">{net}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* 2. OBJETIVO PADRÃO (NOVO) */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Objetivo Padrão</label>
+                                    <select 
+                                        value={formData.default_objective}
+                                        onChange={(e) => setFormData({...formData, default_objective: e.target.value})}
+                                        className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:border-blue-500 outline-none transition-all"
+                                    >
+                                        {Object.values(PostObjective).map((obj) => (
+                                            <option key={obj} value={obj} className="bg-[#0f172a]">{obj}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* 3. PÚBLICO PADRÃO (JÁ EXISTIA) */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Público Padrão</label>
+                                    <select 
+                                        value={formData.default_audience}
+                                        onChange={(e) => setFormData({...formData, default_audience: e.target.value})}
+                                        className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:border-blue-500 outline-none transition-all"
+                                    >
+                                        {Object.values(TargetAudience).map((audience) => (
+                                            <option key={audience} value={audience} className="bg-[#0f172a]">{audience}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* 4. TOM PADRÃO (JÁ EXISTIA) */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tom de Voz Padrão</label>
+                                    <select 
+                                        value={formData.default_tone}
+                                        onChange={(e) => setFormData({...formData, default_tone: e.target.value})}
+                                        className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:border-blue-500 outline-none transition-all"
+                                    >
+                                        {Object.values(PostTone).map((tone) => (
+                                            <option key={tone} value={tone} className="bg-[#0f172a]">{tone}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* BOTÃO DE SALVAR */}
+                            <div className="pt-4 border-t border-slate-800 mt-4 flex justify-end">
+                                <button
+                                    onClick={handleSavePreferences}
+                                    disabled={saving}
+                                    className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition-all shadow-lg shadow-blue-900/20 active:scale-95 disabled:opacity-50"
+                                >
+                                    {saving ? 'Salvando...' : 'Salvar Preferências'}
+                                </button>
+                            </div>
+
                         </div>
                     </div>
 
