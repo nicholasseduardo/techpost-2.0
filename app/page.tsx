@@ -84,9 +84,9 @@ export default function LandingPage() {
               muted
               loop
               playsInline // Essencial para iPhone
-              webkit-playsinline="true" // Adicione essa linha extra para garantir suporte em iOS antigo
+              webkit-playsinline="true"
               controls 
-              poster="/thumbnail-video2.jpg" // 👈 A SALVAÇÃO: Imagem de capa
+              poster="/thumbnail-video2.jpg" 
               preload="metadata" // Carrega só o básico primeiro pra não travar o site
             >
               <source src="/demo-final.mp4" type="video/mp4" />
@@ -192,8 +192,8 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8 mb-24">
             <FeatureCard 
               icon={<Code2 size={28} className="text-blue-400" />}
-              title="Entende seu Código"
-              desc="Cole arquivos de pdf ou imagens. Nossa IA analisa a lógica e enriquece o seu texto para gerar mais autoridade!"
+              title="Use seu Código"
+              desc="Cole arquivos de pdf, imagens, ou conecte com o seu GitHub. Nossa IA analisa a lógica e enriquece o seu texto para gerar mais autoridade!"
             />
             <FeatureCard 
               icon={<Zap size={28} className="text-amber-400" />}
